@@ -1,6 +1,4 @@
-# Colin's ALM Corner Build Tasks - DacPac Change Report
-
-![DacPac Change Report Task](../../images/ss_DacPacChangeReport.png)
+# DacPac Change Report
 
 ## Overview
 This task shows the schema changes of a DacPac between builds. The task adds two sections to the build summary:
