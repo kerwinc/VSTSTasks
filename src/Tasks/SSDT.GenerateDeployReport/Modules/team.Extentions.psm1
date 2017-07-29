@@ -163,7 +163,7 @@ Function Get-BuildArtifact {
         # the drop is a server drop
         Write-Host -Verbose "Downloading drop $($drop.resource.downloadUrl)"
         Invoke-ArtifactDownload -Uri $drop.resource.downloadUrl -OutFile "$Destination\$DropName.zip"
-        $extractTempDirectory = Join-Path $Destination "PrevBuildArtifact"
+        $extractTempDirectory = Join-Path $Destination "TargetBuildArtifact"
 
         if (Test-DirectoryPath -Path $extractTempDirectory) {
           Write-Host "Removing directory: $extractTempDirectory"
