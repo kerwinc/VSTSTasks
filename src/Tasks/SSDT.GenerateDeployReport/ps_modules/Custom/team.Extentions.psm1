@@ -67,6 +67,7 @@ Function Get-DefinitionBuilds {
   }
   Process {
     $url = $env:TEAM_ACCT + "/_apis/build/builds?definitions=$DefinitionId&statusFilter=$StatusFilter&resultFilter=$ResultFilter&api-version=2.0"
+    Write-Output "Looking for builds using api endpoint: $url"
     $result = Invoke-GetCommand -Url $Url
     $jsonResult = $result.Value | Where-Object -Property sourceBranch -Value "refs/heads/$Branch" -EQ | Select-Object -Property Id, status, buildNumber, sourceBranch, result, definition -First $Top
     $jsonResult
@@ -130,12 +131,12 @@ Function Get-BuildArtifact {
     [ValidateNotNullOrEmpty()]
     [Parameter(Mandatory = $true)][string]$DropName,
     [ValidateNotNullOrEmpty()]
-    [Parameter(Mandatory = $true)][string]$DacpacName,
+    [Parameter(Mandatory = $true)][string]$DacpacFileName,
     [ValidateNotNullOrEmpty()]
     [Parameter(Mandatory = $true)][string]$Destination
   )
   Process {
-    Write-Host "Ok, so now we need to find the build artifacts for build Id: $definitionId"
+    Write-Host "Searching for the build artifact ($DropName) for build Id $BuildId with the file name $DacpacFileName"
     $artifacts = (Get-BuildArtifacts -BuildId $BuildId)
     if ($artifacts -eq $null -or [int]$($artifacts.count) -eq 0) {
       Write-Warning "No build artifacts found with the name '$DropName'"
@@ -173,12 +174,12 @@ Function Get-BuildArtifact {
         Write-Host "Extracting artifacts to $extractTempDirectory"
         ExtractZipFile -Zipfilename "$Destination\$DropName.zip" -Destination $extractTempDirectory
 
-        Write-Host "Searching for $DacpacName.dacpac"
-        $dacpac = Get-ChildItem -LiteralPath $extractTempDirectory -File -Filter "$DacpacName.dacpac" -Recurse
+        Write-Host "Searching for $DacpacFileName"
+        $dacpac = Get-ChildItem -LiteralPath $extractTempDirectory -File -Filter "$DacpacFileName" -Recurse
         if ($dacpac) {
           return $dacpac.FullName  
         }
-        Write-Warning "Could not find any dacpac files with the name: $DacpacName"
+        Write-Warning "Could not find any dacpac files with the name: $DacpacFileName"
         return
       }
     }

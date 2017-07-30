@@ -1,7 +1,7 @@
 {
-  "id": "F5D9D12E-338A-4B5D-B815-7BD8AC5CE7B2",
-  "name": "DacPacBuildCompare",
-  "friendlyName": "DacPac Build Compare",
+  "id": "2DFD3762-0E9B-4AF5-801F-7667287E02A0",
+  "name": "DacpacBranchBuildCompare",
+  "friendlyName": "DacPac Branch Build Compare",
   "description": "Provides a report on database model changes when compared to the last build for the specified branch",
   "author": "Kerwin Carpede",
   "helpMarkDown": "",
@@ -16,11 +16,21 @@
   "version": {
     "Major": "0",
     "Minor": "1",
-    "Patch": "1"
+    "Patch": "17"
   },
   "minimumAgentVersion": "1.91.0",
-  "instanceNameFormat": "DacPac Build Compare $(dacpacName).dacpac",
+  "instanceNameFormat": "DacPac Branch Build Compare",
   "groups": [
+    {
+      "name": "CompareBranch",
+      "displayName": "Compare Branch Build",
+      "isExpanded": false
+    },
+    {
+      "name": "DacFx",
+      "displayName": "DacFx Settings",
+      "isExpanded": false
+    },
     {
       "name": "advanced",
       "displayName": "Advanced",
@@ -29,36 +39,65 @@
   ],
   "inputs": [
     {
-      "name": "sourceBranchName",
+      "name": "DacpacFileName",
       "type": "string",
-      "label": "Source Branch Name",
-      "defaultValue": "ref/head/master",
+      "label": "Dacpac File Name",
+      "defaultValue": "",
       "required": true,
-      "helpMarkDown": "Specify the branch to compare to" 
+      "helpMarkDown": "Specify the name dacpac to compare. It is expected that the dacpac file names should be identical" 
     },
     {
-      "name": "dacpacFilePath",
+      "name": "DacpacPath",
       "type": "string",
       "label": "Dacpac File Path",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Specify the dacpac path in the current build" 
+    },
+    {
+      "name": "Branch",
+      "type": "string",
+      "label": "Target Branch Name",
+      "defaultValue": "master",
+      "required": true,
+      "helpMarkDown": "Specify the branch to compare to",
+      "groupName": "CompareBranch"
+    },
+    {
+      "name": "ArtifactDropName",
+      "type": "string",
+      "label": "Artifact Name",
       "defaultValue": "drop",
       "required": true,
-      "helpMarkDown": "Specify the dacpac path" 
+      "helpMarkDown": "Specify the name of the artifact in the target branch",
+      "groupName": "CompareBranch"
     },
     {
-      "name": "dacpacName",
+      "name": "CompareDirectory",
       "type": "string",
-      "label": "DacPac Name",
-      "defaultValue": "",
+      "label": "Compare Directory",
+      "defaultValue": "$(Build.StagingDirectory)\\SchemaCompare",
       "required": true,
-      "helpMarkDown": "Name of the dacpac (without .dacpac extension) to run the schema compare on."
+      "helpMarkDown": "Specify the name of the artifact in the target branch",
+      "groupName": "CompareBranch"
     },
     {
-      "name": "targetDacPacPath",
-      "type": "filePath",
-      "label": "Compiled DacPac Path",
-      "defaultValue": "",
+      "name": "ReportDirectory",
+      "type": "string",
+      "label": "Report Directory",
+      "defaultValue": "$(Build.StagingDirectory)\\Reports",
       "required": true,
-      "helpMarkDown": "Path to find the target dacpac (typically the artifact staging path where the dacpac will be uploaded from)."
+      "helpMarkDown": "Specify the name of the artifact in the target branch",
+      "groupName": "CompareBranch"
+    },
+    {
+      "name": "SqlPackagePath",
+      "type": "string",
+      "label": "SqlPackage Path",
+      "defaultValue": "C:\\Program Files\\Microsoft SQL Server\\140\\DAC\\bin\\SqlPackage.exe",
+      "required": true,
+      "helpMarkDown": "Path to the DacFx SqlPackage.exe command line utility",
+      "groupName": "DacFx"
     },
     {
       "name": "extraArgs",
@@ -67,12 +106,12 @@
       "defaultValue": "",
       "required": false,
       "helpMarkDown": "Extra args to use for running the SQLPackage.exe schema compare command.",
-      "groupName": "advanced"
+      "groupName": "DacFx"
     }
   ],
   "execution": {
     "PowerShell3": {
-      "target": "GenerateDacpacBuildReport.ps1"
+      "target": "CreateDacpacBranchBuildReport.ps1"
     }
   }
 }

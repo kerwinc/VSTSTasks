@@ -3,23 +3,23 @@
   <xsl:output method="text" />
   <xsl:template match="/">
         <xsl:if test="count(dr:DeploymentReport/dr:Errors/dr:Error)!=0">
-## Errors
+### Errors
             <xsl:for-each select="dr:DeploymentReport/dr:Errors/dr:Error">
   - <xsl:value-of select="."/>
             </xsl:for-each>
         </xsl:if>
 
         <xsl:if test="count(dr:DeploymentReport/dr:Warnings/dr:Warning)!=0">
-## Warnings
+### Warnings
             <xsl:for-each select="dr:DeploymentReport/dr:Warnings/dr:Warning">
   - <xsl:value-of select="."/>
             </xsl:for-each>
         </xsl:if>
 
         <xsl:if test="count(dr:DeploymentReport/dr:Alerts/dr:Alert[dr:Issue[not(@Id)]])!=0">
-## Alerts
+### Alerts
           <xsl:for-each select="dr:DeploymentReport/dr:Alerts/dr:Alert[dr:Issue[not(@Id)]]">
-  ### <xsl:value-of select="@Name"/>
+  #### <xsl:value-of select="@Name"/>
               <xsl:for-each select="dr:Issue">
     - <xsl:value-of select="@Value"/>
               </xsl:for-each>
@@ -27,9 +27,9 @@
         </xsl:if>
 
         <xsl:if test="count(dr:DeploymentReport/dr:Operations/dr:Operation)!=0">
-## Operations
+### Operations
           <xsl:for-each select="dr:DeploymentReport/dr:Operations/dr:Operation">
-###  <xsl:value-of select="@Name"/>
+####  <xsl:value-of select="@Name"/>
               <xsl:for-each select="dr:Item">
   - <xsl:value-of select="@Value"/> `<xsl:value-of select="@Type"/>`
     <xsl:apply-templates/>
