@@ -8,14 +8,12 @@
   - <xsl:value-of select="."/>
             </xsl:for-each>
         </xsl:if>
-
         <xsl:if test="count(dr:DeploymentReport/dr:Warnings/dr:Warning)!=0">
 ### Warnings
             <xsl:for-each select="dr:DeploymentReport/dr:Warnings/dr:Warning">
   - <xsl:value-of select="."/>
             </xsl:for-each>
         </xsl:if>
-
         <xsl:if test="count(dr:DeploymentReport/dr:Alerts/dr:Alert[dr:Issue[not(@Id)]])!=0">
 ### Alerts
           <xsl:for-each select="dr:DeploymentReport/dr:Alerts/dr:Alert[dr:Issue[not(@Id)]]">
@@ -25,7 +23,6 @@
               </xsl:for-each>
           </xsl:for-each>
         </xsl:if>
-
         <xsl:if test="count(dr:DeploymentReport/dr:Operations/dr:Operation)!=0">
 ### Operations
           <xsl:for-each select="dr:DeploymentReport/dr:Operations/dr:Operation">
@@ -36,15 +33,11 @@
               </xsl:for-each>
           </xsl:for-each>
         </xsl:if>
-
         <xsl:if test="count(dr:DeploymentReport/dr:Operations)=0">
 No changes - models are identical.
         </xsl:if>
-
   </xsl:template>
-
   <xsl:template match="dr:DeploymentReport/dr:Operations/dr:Operation/dr:Item/dr:Issue">
     <xsl:text disable-output-escaping="yes"><![CDATA[>]]></xsl:text> **<xsl:value-of select="/dr:DeploymentReport/dr:Alerts/dr:Alert/dr:Issue[@Id=current()/@Id]/../@Name"/>**: _<xsl:value-of select="/dr:DeploymentReport/dr:Alerts/dr:Alert/dr:Issue[@Id=current()/@Id]/@Value"/>_
   </xsl:template>
-
 </xsl:stylesheet>
