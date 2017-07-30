@@ -67,7 +67,7 @@ if (-not(Test-DirectoryPath -Path $CompareDirectory)) {
   New-Directory -Path $CompareDirectory
 }
 
-Write-Host "Build found for $Branch branch (Build Id = $($build.id). Looking for Artifact: $ArtifactDropName"
+Write-Host "Build found for $Branch branch (Build Number = $($build.id). Looking for Artifact: $ArtifactDropName"
 $targetDacpac = Get-BuildArtifact -BuildId $Build.id -DropName $ArtifactDropName -ArtifactFileName $DacpacFileName -Destination $CompareDirectory
 if ($targetDacpac -ne $null) {
   Write-Verbose -Verbose "Found source dacpac $targetDacpac"
@@ -93,14 +93,12 @@ if ($targetDacpac -ne $null) {
 
     Convert-Report -ReportPath $("$ReportDirectory\DeployReport.xml") -ReportXsltPath "$scriptLocation\report-transformToMd.xslt"
 
-    # Add the summary sections
-    $summaryTitle = "Deployment report compared to $Branch with build $($build.id)"
-
     Write-Host "Almost done, just making the deployment report look pretty..."
     $reportContent = Get-Content -LiteralPath "$scriptLocation\report-template.md"
     $deployReportContent = (Get-Content -LiteralPath "$ReportDirectory\DeployReport.md") -join "`n"
     $reportContent = $reportContent.Replace("{{DeployReport}}", $deployReportContent)
     $reportContent = $reportContent.Replace("{{Branch}}", $Branch)
+    $reportContent = $reportContent.Replace("{{BuildNumber}}", $Build.buildNumber)
     Set-Content -LiteralPath "$ReportDirectory\DeployReport.md" -Value $reportContent
 
     Write-Host "Checking the deployment report for any alerts"
@@ -111,6 +109,8 @@ if ($targetDacpac -ne $null) {
       }
     }
 
+    # Add the summary sections
+    $summaryTitle = "Deployment report compared to $Branch branch (Build $($build.buildNumber))"
     Write-Host "##vso[task.addattachment type=Distributedtask.Core.Summary;name=$summaryTitle;]$ReportDirectory\DeployReport.md"
     Write-Host "##vso[task.addattachment type=ChangeScript;name=ChangeScript;]$ReportDirectory\ChangeScript.md"
   }
