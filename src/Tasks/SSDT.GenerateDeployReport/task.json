@@ -16,7 +16,7 @@
   "version": {
     "Major": "0",
     "Minor": "1",
-    "Patch": "27"
+    "Patch": "28"
   },
   "minimumAgentVersion": "1.91.0",
   "instanceNameFormat": "DacPac Branch Build Compare",
