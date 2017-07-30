@@ -16,7 +16,7 @@
   "version": {
     "Major": "0",
     "Minor": "1",
-    "Patch": "29"
+    "Patch": "37"
   },
   "minimumAgentVersion": "1.91.0",
   "instanceNameFormat": "DacPac Branch Build Compare",
@@ -103,10 +103,19 @@
       "name": "extraArgs",
       "type": "string",
       "label": "Extra SQLPackage args",
-      "defaultValue": "",
+      "defaultValue": "false",
       "required": false,
       "helpMarkDown": "Extra args to use for running the SQLPackage.exe schema compare command.",
       "groupName": "DacFx"
+    },
+    {
+      "name": "FailOnCompareBuildNotFound",
+      "type": "boolean",
+      "label": "Fail if Compare Build Not Found",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Throws an error if it did not find a successful build for the target branch",
+      "groupName": "advanced"
     }
   ],
   "execution": {

@@ -4,7 +4,8 @@ function New-DeployReport {
     [string]$DatabaseName,
     [string]$SourceDacpac,
     [string]$TargetDacpac,
-    [string]$OutputPath,
+    [string]$OutputFilePath,
+    [string]$BuildNumber,
     [string]$ExtraArgs
   )
 
@@ -13,7 +14,7 @@ function New-DeployReport {
 
   Write-Host "Generating report: source = $SourceDacpac, target = $TargetDacpac"
   & "$SqlPackagePath" /Action:DeployReport /SourceFile:$SourceDacpac `
-    /TargetFile:$TargetDacpac /OutputPath:$("$OutputPath\DeployReport.xml") `
+    /TargetFile:$TargetDacpac /OutputPath:$OutputFilePath `
     /TargetDatabaseName:$DatabaseName /OverwriteFiles:True
   #   $commandArgs = "/a:{0} /sf:`"$SourceDacpac`" /tf:`"$TargetDacpac`" /tdn:Test /op:`"{1}`" {2}"
   #   $reportArgs = $commandArgs -f "DeployReport", "./SchemaCompare/SchemaCompare.xml", $ExtraArgs
@@ -28,7 +29,7 @@ function New-SQLChangeScript {
     [string]$DatabaseName,
     [string]$SourceDacpac,
     [string]$TargetDacpac,
-    [string]$OutputPath,
+    [string]$OutputFilePath,
     [string]$ExtraArgs
   )
 
@@ -37,7 +38,7 @@ function New-SQLChangeScript {
 
   Write-Host "Generating report: source = $SourceDacpac, target = $TargetDacpac"
   & "$SqlPackagePath" /Action:Script /SourceFile:$SourceDacpac `
-    /TargetFile:$TargetDacpac /OutputPath:$("$OutputPath\ChangeScript.sql") `
+    /TargetFile:$TargetDacpac /OutputPath:$OutputFilePath `
     /TargetDatabaseName:$DatabaseName /OverwriteFiles:True
 #   $scriptArgs = $commandArgs -f "Script", "./SchemaCompare/ChangeScript.sql", $ExtraArgs
 #   $scriptCommand = "`"$SqlPackagePath`" $scriptArgs"
@@ -48,7 +49,9 @@ function New-SQLChangeScript {
 function Convert-Report {
   param(
     [string]$ReportPath,
-    [string]$ReportXsltPath
+    [string]$ReportXsltPath,
+    [string]$ChangeScriptFilePath,
+    [string]$OutputDirectory
   )
 
   Write-Verbose -Verbose "Converting report $ReportPath to md"
@@ -62,18 +65,17 @@ function Convert-Report {
   $stream.Position = 0
   $reader = New-Object System.IO.StreamReader($stream)
   $text = $reader.ReadToEnd()
-
-  $outputFolder = $(Get-Item -LiteralPath $ReportPath).Directory.FullName
+  
+  $reportFolder = $(Get-Item -LiteralPath $ReportPath).Directory.FullName
 
   Write-Verbose -Verbose "Writing out transformed report to deploymentReport.md"
-  Set-Content -Path $("$outputFolder\DeployReport.md") -Value $text
-
+  Set-Content -Path $("$OutputDirectory\DeployReport.md") -Value $text
   $mdTemplate = "**Note**: Even if there are no schema changes, this script would still be run against the target environment. This usually includes
                 some housekeeping code and any pre- and post-deployment scripts you may have in your database model.
                 ``````
                 {0}
                 ``````
                 "
-  $md = $mdTemplate -f $(Get-Content "$outputFolder\ChangeScript.sql" -Raw)
-  Set-Content -Path $("$outputFolder\ChangeScript.md") -Value $md
+  $md = $mdTemplate -f $(Get-Content $ChangeScriptFilePath -Raw)
+  Set-Content -Path $("$OutputDirectory\ChangeScript.md") -Value $md
 }
