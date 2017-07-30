@@ -68,7 +68,7 @@ if (-not(Test-DirectoryPath -Path $CompareDirectory)) {
 }
 
 Write-Host "Build found for $Branch branch (Build Id = $($build.id). Looking for Artifact: $ArtifactDropName"
-$targetDacpac = Get-BuildArtifact -BuildId $Build.id -DropName $ArtifactDropName -DacpacFileName $DacpacFileName -Destination $CompareDirectory
+$targetDacpac = Get-BuildArtifact -BuildId $Build.id -DropName $ArtifactDropName -ArtifactFileName $DacpacFileName -Destination $CompareDirectory
 if ($targetDacpac -ne $null) {
   Write-Verbose -Verbose "Found source dacpac $targetDacpac"
 
@@ -81,8 +81,11 @@ if ($targetDacpac -ne $null) {
       Write-Host "Creating directory: $ReportDirectory"
       New-Directory -Path $ReportDirectory
     }
-
+    
     Write-Host "Creating Deployment Report..."
+    Write-Host "Source Dacpac: [$sourceDacpac]"
+    Write-Host "Target Dacpac: [$targetDacpac]"
+    
     New-DeployReport -SqlPackagePath $SqlPackagePath -DatabaseName $DatabaseName -SourceDacpac $sourceDacpac -TargetDacpac $targetDacpac -OutputPath $ReportDirectory -ExtraArgs $extraArgs
 
     Write-Host "Generateing Change Script..."
@@ -92,8 +95,27 @@ if ($targetDacpac -ne $null) {
 
     # Add the summary sections
     $summaryTitle = "Deployment report compared to $Branch with build $($build.id)"
+
+    Write-Host "Almost done, just making the deployment report look pretty..."
+    $reportContent = Get-Content -LiteralPath "$scriptLocation\report-template.md"
+    $deployReportContent = (Get-Content -LiteralPath "$ReportDirectory\DeployReport.md") -join "`n"
+    $reportContent = $reportContent.Replace("{{DeployReport}}", $deployReportContent)
+    $reportContent = $reportContent.Replace("{{Branch}}", $Branch)
+    Set-Content -LiteralPath "$ReportDirectory\DeployReport.md" -Value $reportContent
+
+    Write-Host "Checking the deployment report for any alerts"
+    [xml]$xml = Get-Content -LiteralPath $("$ReportDirectory\DeployReport.xml")
+    if ($xml -ne $null -and $xml.DeploymentReport -ne $null -and $xml.DeploymentReport.Alerts -ne $null) {
+      foreach ($alert in $xml.DeploymentReport.Alerts.Alert) {
+        Write-Warning "SSDT Alert: $($alert.Name) detected on $($alert.Issue.Value)"
+      }
+    }
+
     Write-Host "##vso[task.addattachment type=Distributedtask.Core.Summary;name=$summaryTitle;]$ReportDirectory\DeployReport.md"
-    Write-Host "##vso[task.addattachment type=myAttachmentType;name=ChangeScript;]$ReportDirectory\ChangeScript.md"
+    Write-Host "##vso[task.addattachment type=ChangeScript;name=ChangeScript;]$ReportDirectory\ChangeScript.md"
+  }
+  else { 
+    Write-Warning "Could not find $targetDacpac in the $Branch's build artifacts... Try building the $Branch branch first. Also make sure that the artifacts are published to the build."
   }
 }
 

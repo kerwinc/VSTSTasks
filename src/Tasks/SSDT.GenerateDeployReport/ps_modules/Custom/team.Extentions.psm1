@@ -83,7 +83,7 @@ Function Get-VSTSBuild {
   Process {
 
     $resultString = (Invoke-RestMethod -Uri "$baseUrl/_apis/build/builds/$BuildId/" -Headers @{Authorization = "Basic $env:TEAM_PAT"})
-    $jsonResult = $resultString #| Select-Object -Property Id, status, buildNumber, sourceBranch, result -First $Top
+    $jsonResult = $resultString
     $jsonResult
   }
 }
@@ -131,12 +131,12 @@ Function Get-BuildArtifact {
     [ValidateNotNullOrEmpty()]
     [Parameter(Mandatory = $true)][string]$DropName,
     [ValidateNotNullOrEmpty()]
-    [Parameter(Mandatory = $true)][string]$DacpacFileName,
+    [Parameter(Mandatory = $true)][string]$ArtifactFileName,
     [ValidateNotNullOrEmpty()]
     [Parameter(Mandatory = $true)][string]$Destination
   )
   Process {
-    Write-Host "Searching for the build artifact ($DropName) for build Id $BuildId with the file name $DacpacFileName"
+    Write-Host "Searching for the build artifact ($DropName) for build Id $BuildId with the file name $ArtifactFileName"
     $artifacts = (Get-BuildArtifacts -BuildId $BuildId)
     if ($artifacts -eq $null -or [int]$($artifacts.count) -eq 0) {
       Write-Warning "No build artifacts found with the name '$DropName'"
@@ -164,7 +164,7 @@ Function Get-BuildArtifact {
         # the drop is a server drop
         Write-Host -Verbose "Downloading drop $($drop.resource.downloadUrl)"
         Invoke-ArtifactDownload -Uri $drop.resource.downloadUrl -OutFile "$Destination\$DropName.zip"
-        $extractTempDirectory = Join-Path $Destination "TargetBuildArtifact"
+        $extractTempDirectory = Join-Path $Destination $DropName
 
         if (Test-DirectoryPath -Path $extractTempDirectory) {
           Write-Host "Removing directory: $extractTempDirectory"
@@ -174,12 +174,18 @@ Function Get-BuildArtifact {
         Write-Host "Extracting artifacts to $extractTempDirectory"
         ExtractZipFile -Zipfilename "$Destination\$DropName.zip" -Destination $extractTempDirectory
 
-        Write-Host "Searching for $DacpacFileName"
-        $dacpac = Get-ChildItem -LiteralPath $extractTempDirectory -File -Filter "$DacpacFileName" -Recurse
+        Write-Host "Searching for $ArtifactFileName in $extractTempDirectory"
+
+        $fileCount = Get-ChildItem -LiteralPath $extractTempDirectory -File -Filter "$ArtifactFileName" -Recurse | Measure-Object | % {$_.Count}
+        if ($fileCount -gt 1) {
+          throw "More than 1 $ArtifactFileName found! There must be no ambiguity when locating the file in the artifacts folder"
+        }
+
+        $dacpac = Get-ChildItem -LiteralPath $extractTempDirectory -File -Filter "$ArtifactFileName" -Recurse
         if ($dacpac) {
           return $dacpac.FullName  
         }
-        Write-Warning "Could not find any dacpac files with the name: $DacpacFileName"
+        Write-Warning "Could not find any dacpac files with the name: $ArtifactFileName"
         return
       }
     }
