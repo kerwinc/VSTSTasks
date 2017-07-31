@@ -16,7 +16,7 @@
   "version": {
     "Major": "0",
     "Minor": "1",
-    "Patch": "37"
+    "Patch": "43"
   },
   "minimumAgentVersion": "1.91.0",
   "instanceNameFormat": "DacPac Branch Build Compare",
@@ -28,7 +28,7 @@
     },
     {
       "name": "DacFx",
-      "displayName": "DacFx Settings",
+      "displayName": "SQLPackage Configuration",
       "isExpanded": false
     },
     {
@@ -39,20 +39,20 @@
   ],
   "inputs": [
     {
-      "name": "DacpacFileName",
-      "type": "string",
-      "label": "Dacpac File Name",
+      "name": "DacpacFile",
+      "type": "filePath",
+      "label": "Dacpac File",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "Specify the name dacpac to compare. It is expected that the dacpac file names should be identical" 
+      "helpMarkDown": "Specify the name dacpac to compare from the current build. It is expected that the dacpac file names should be identical"
     },
     {
-      "name": "DacpacPath",
-      "type": "string",
-      "label": "Dacpac File Path",
+      "name": "PublishProfile",
+      "type": "filePath",
+      "label": "Publish Profile",
+      "required": false,
       "defaultValue": "",
-      "required": true,
-      "helpMarkDown": "Specify the dacpac path in the current build" 
+      "helpMarkDown": "Publish profile provides fine-grained control over Azure SQL Database creation or upgrades. Specify the path to the Publish profile XML file on the automation agent or on a UNC share. Predefined system variables like, $(agent.buildDirectory) or $(agent.releaseDirectory) can also be used here."
     },
     {
       "name": "Branch",
@@ -100,13 +100,13 @@
       "groupName": "DacFx"
     },
     {
-      "name": "extraArgs",
+      "name": "AdditionalArguments",
       "type": "string",
-      "label": "Extra SQLPackage args",
-      "defaultValue": "false",
+      "label": "Additional SqlPackage.exe Arguments",
       "required": false,
-      "helpMarkDown": "Extra args to use for running the SQLPackage.exe schema compare command.",
-      "groupName": "DacFx"
+      "groupName": "DacFx",
+      "defaultValue": "",
+      "helpMarkDown": "Additional SqlPackage.exe arguments that will be applied when generating the deployment report and change script /p:IgnoreAnsiNulls=True /p:IgnoreComments=True. These arguments will override the settings in the Publish profile XML file (if provided)."
     },
     {
       "name": "FailOnCompareBuildNotFound",
@@ -115,6 +115,15 @@
       "defaultValue": "false",
       "required": false,
       "helpMarkDown": "Throws an error if it did not find a successful build for the target branch",
+      "groupName": "advanced"
+    },
+    {
+      "name": "UseWindowsAuthentication",
+      "type": "boolean",
+      "label": "Use Windows Authentication",
+      "defaultValue": "true",
+      "required": false,
+      "helpMarkDown": "Use windows authentication when communicating with Team Foundation Server's API",
       "groupName": "advanced"
     }
   ],

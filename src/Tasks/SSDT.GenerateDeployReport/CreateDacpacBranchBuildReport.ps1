@@ -20,14 +20,19 @@ $PersonalAccessToken = $env:SYSTEM_ACCESSTOKEN
 $tempDirectory = "$env:BUILD_STAGINGDIRECTORY\temp"
 $Branch = Get-VstsInput -Name "Branch" -Require
 $ArtifactDropName = Get-VstsInput -Name "ArtifactDropName" -Require
-$DacpacFileName = Get-VstsInput -Name "DacpacFileName" -Require
-$DacpacPath = Get-VstsInput -Name "DacpacPath" -Require
+$DacpacFile = Get-VstsInput -Name "DacpacFile" -Require
+$PublishProfile = Get-VstsInput -Name "PublishProfile"
+$AdditionalArguments = Get-VstsInput -Name "AdditionalArguments"
 $CompareDirectory = Get-VstsInput -Name "CompareDirectory" -Require
 $ReportDirectory = Get-VstsInput -Name "ReportDirectory" -Require
 $SqlPackagePath = Get-VstsInput -Name "SqlPackagePath" -Require
-$FailOnCompareBuildNotFound =[System.Convert]::ToBoolean($(Get-VstsInput -Name "FailOnCompareBuildNotFound" -Require))
+$FailOnCompareBuildNotFound = [System.Convert]::ToBoolean($(Get-VstsInput -Name "FailOnCompareBuildNotFound" -Require))
+$useWindowsAuthentication = [System.Convert]::ToBoolean($(Get-VstsInput -Name "UseWindowsAuthentication"))
 
 $DatabaseName = "SchemaCompare"
+
+$DacpacFileName = (Get-Item -LiteralPath $DacpacFile).Name
+$DacpacPath = (Get-Item -LiteralPath $DacpacFile).Directory.FullName
 
 Write-Host "DacpacName: [$DacpacFileName]"
 Write-Host "DacpacPath: [$DacpacPath]"
@@ -39,11 +44,14 @@ Write-Host "BuildDefinitionId: [$BuildDefinitionId]"
 
 $scriptLocation = (Get-Item -LiteralPath (Split-Path -Parent $MyInvocation.MyCommand.Path)).FullName
 
+# Load all dependent files for execution
+# . "$scriptLocation\Utility.ps1"
+
 #Import Required Modules
 Import-Module "$scriptLocation\ps_modules\Custom\File.Extensions.psm1" -Force
 Import-Module "$scriptLocation\ps_modules\Custom\team.psm1" -Force
 Import-Module "$scriptLocation\ps_modules\Custom\team.Extentions.psm1" -Force
-Import-Module "$scriptLocation\ps_modules\Custom\Dacfx.Extensions.psm1" -Force
+Import-Module "$scriptLocation\ps_modules\Custom\Dacfx.Extensions.psm1" -Force -DisableNameChecking
 
 if (-not $ProjectCollectionUri.EndsWith("/")) {
   $ProjectCollectionUri = $ProjectCollectionUri + '/'
@@ -52,7 +60,12 @@ $ProjectCollectionUri = $ProjectCollectionUri + $ProjectName + '/'
 
 Remove-TeamAccount -Force
 Write-Host "Addind account for $ProjectCollectionUri using Personal Access Token: $PersonalAccessToken"
-Add-TeamAccount -Account $ProjectCollectionUri -PersonalAccessToken $PersonalAccessToken -Level Process
+if ($useWindowsAuthentication -eq $true) {
+  Add-TeamAccount -Account $ProjectCollectionUri -UseWindowsAuthentication -Level Process
+}
+else {
+  Add-TeamAccount -Account $ProjectCollectionUri -PersonalAccessToken $PersonalAccessToken -Level Process  
+}
 
 Write-Host "Getting the last successfull build for Build Definition Id: $BuildDefinitionId and branch: $Branch"
 $build = Get-DefinitionBuilds -DefinitionId $BuildDefinitionId -Branch $Branch -StatusFilter completed -ResultFilter succeeded -top 1 -Verbose
@@ -83,11 +96,13 @@ if (($build -ne $null) -and ($build.id -gt 0) ) {
       Write-Host "Target Dacpac: [$targetDacpac]"
 
       $deployReportFilePath = $("$ReportDirectory\DeployReport.$($build.buildNumber).xml")
-      New-DeployReport -SqlPackagePath $SqlPackagePath -DatabaseName $DatabaseName -SourceDacpac $sourceDacpac -TargetDacpac $targetDacpac -OutputFilePath $deployReportFilePath -ExtraArgs $extraArgs
+      New-DeployReport -SqlPackagePath $SqlPackagePath -DatabaseName $DatabaseName -SourceDacpac $sourceDacpac -TargetDacpac $targetDacpac `
+                       -PublishProfile $PublishProfile -OutputFilePath $deployReportFilePath -AdditionalArguments $AdditionalArguments
 
       Write-Host "Generateing Change Script..."
       $changeScriptFilePath = $("$ReportDirectory\ChangeScript.$($build.buildNumber).sql")
-      New-SQLChangeScript -SqlPackagePath $SqlPackagePath -DatabaseName $DatabaseName -SourceDacpac $sourceDacpac -TargetDacpac $targetDacpac -OutputFilePath $changeScriptFilePath -ExtraArgs $extraArgs
+      New-SQLChangeScript -SqlPackagePath $SqlPackagePath -DatabaseName $DatabaseName -SourceDacpac $sourceDacpac -TargetDacpac $targetDacpac `
+                          -PublishProfile $PublishProfile -OutputFilePath $changeScriptFilePath -AdditionalArguments $AdditionalArguments
 
       if (-not(Test-DirectoryPath -Path $tempDirectory)) {
         Write-Host "Creating directory: $tempDirectory"

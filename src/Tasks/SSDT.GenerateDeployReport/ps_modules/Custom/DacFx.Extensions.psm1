@@ -1,26 +1,51 @@
+#SqlPackage.exe help: https://msdn.microsoft.com/library/hh550080(vs.103).aspx
+
+function Execute-Command {
+  param(
+    [String][Parameter(Mandatory = $true)] $FileName,
+    [String][Parameter(Mandatory = $true)] $Arguments
+  )
+
+  $ErrorActionPreference = 'Continue' 
+  Invoke-Expression "& '$FileName' --% $Arguments" 2>&1 -ErrorVariable errors | ForEach-Object {
+    if ($_ -is [System.Management.Automation.ErrorRecord]) {
+      Write-Error $_
+    }
+    else {
+      Write-Host $_
+    }
+  }
+    
+  foreach ($errorMsg in $errors) {
+    Write-Error $errorMsg
+  }
+  $ErrorActionPreference = 'Stop'
+  if ($LASTEXITCODE -ne 0) {
+    throw  (Get-VstsLocString -Key "SQLDacpacTaskFailed")
+  }
+}
+
 function New-DeployReport {
   param(
     [string]$SqlPackagePath,
     [string]$DatabaseName,
     [string]$SourceDacpac,
     [string]$TargetDacpac,
+    [string]$PublishProfile,
     [string]$OutputFilePath,
-    [string]$BuildNumber,
-    [string]$ExtraArgs
+    [string]$AdditionalArguments
   )
 
   $SourceDacpac = Resolve-Path -Path $SourceDacpac
   $TargetDacpac = Resolve-Path -Path $TargetDacpac
 
   Write-Host "Generating report: source = $SourceDacpac, target = $TargetDacpac"
-  & "$SqlPackagePath" /Action:DeployReport /SourceFile:$SourceDacpac `
-    /TargetFile:$TargetDacpac /OutputPath:$OutputFilePath `
-    /TargetDatabaseName:$DatabaseName /OverwriteFiles:True
-  #   $commandArgs = "/a:{0} /sf:`"$SourceDacpac`" /tf:`"$TargetDacpac`" /tdn:Test /op:`"{1}`" {2}"
-  #   $reportArgs = $commandArgs -f "DeployReport", "./SchemaCompare/SchemaCompare.xml", $ExtraArgs
-  #   $reportCommand = "`"$SqlPackagePath`" $reportArgs"
-  #   $reportCommand
-  #   Invoke-Command -command $reportCommand
+  
+  $scriptArgument = "/Action:DeployReport /SourceFile:`"$SourceDacpac`" /TargetFile:`"$TargetDacpac`" /TargetDatabaseName:`"$DatabaseName`" /OutputPath:`"$OutputFilePath`" /Profile:`"$PublishProfile`" $AdditionalArguments"
+  $SqlPackageCommand = "`"$SqlPackagePath`" $scriptArgument"
+
+  Write-Host "Executing : $SqlPackageCommand"
+  Execute-Command -FileName $SqlPackagePath -Arguments $scriptArgument
 }
 
 function New-SQLChangeScript {
@@ -29,21 +54,21 @@ function New-SQLChangeScript {
     [string]$DatabaseName,
     [string]$SourceDacpac,
     [string]$TargetDacpac,
+    [string]$PublishProfile,
     [string]$OutputFilePath,
-    [string]$ExtraArgs
+    [string]$AdditionalArguments
   )
 
   $SourceDacpac = Resolve-Path -Path $SourceDacpac
   $TargetDacpac = Resolve-Path -Path $TargetDacpac
 
   Write-Host "Generating report: source = $SourceDacpac, target = $TargetDacpac"
-  & "$SqlPackagePath" /Action:Script /SourceFile:$SourceDacpac `
-    /TargetFile:$TargetDacpac /OutputPath:$OutputFilePath `
-    /TargetDatabaseName:$DatabaseName /OverwriteFiles:True
-#   $scriptArgs = $commandArgs -f "Script", "./SchemaCompare/ChangeScript.sql", $ExtraArgs
-#   $scriptCommand = "`"$SqlPackagePath`" $scriptArgs"
-#   $scriptCommand
-#   Invoke-Command -command $scriptCommand
+  
+  $scriptArgument = "/Action:Script /SourceFile:`"$SourceDacpac`" /TargetFile:`"$TargetDacpac`" /TargetDatabaseName:`"$DatabaseName`" /OutputPath:`"$OutputFilePath`" /Profile:`"$PublishProfile`" $AdditionalArguments"
+  $SqlPackageCommand = "`"$SqlPackagePath`" $scriptArgument"
+
+  Write-Host "Executing : $SqlPackageCommand"
+  Execute-Command -FileName $SqlPackagePath -Arguments $scriptArgument
 }
 
 function Convert-Report {
