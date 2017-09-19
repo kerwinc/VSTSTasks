@@ -1,0 +1,95 @@
+{
+  "manifestVersion": 1,
+  "id": "devbraino-buildtasks",
+  "name": "Colin's ALM Corner Build & Release Tools",
+  "version": "0.1.22",
+  "publisher": "Kerwin Carpede",
+  "public": true,
+  "repository": {
+    "type": "git",
+    "uri": "https://github.com/kerwinc/VSTSTasks"
+  },
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "description": "Build extensions for Team Services and Team Foundation Server",
+  "categories": [
+    "Build and release"
+  ],
+  "tags": [
+    "Gates",
+    "Gitflow",
+    "build",
+    "dacpac",
+    "SSDT"
+  ],
+  "screenshots": [
+    {
+      "path": "images/Rules.png"
+    },
+    {
+      "path": "images/limits.png"
+    },
+    {
+      "path": "images/branches.png"
+    }
+  ],
+  "content": {
+    "details": {
+      "path": "overview.md"
+    },
+    "license": {
+      "path": "license.txt"
+    }
+  },
+  "links": {
+    "home": {
+      "uri": "http://devbraino.com"
+    },
+    "repository": {
+      "uri": "https://github.com/kerwinc/VSTSTasks"
+    },
+    "issues": {
+      "uri": "https://github.com/kerwinc/VSTSTasks/issues"
+    }
+  },
+  "branding": {
+    "color": "rgb(36, 43, 50)",
+    "theme": "dark"
+  },
+  "icons": {
+    "default": "images/extension-icon.png"
+  },
+  "files": [
+    {
+      "path": "Tasks/GitflowBranchGate"
+    },
+    {
+      "path": "Tasks/SSDT.GenerateDeployReport"
+    }
+  ],
+  "contributions": [
+    {
+      "id": "gitflow-branch-gate-task",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "Tasks/GitflowBranchGate"
+      }
+    },
+    {
+      "id": "ssdt-dacpac-branchcompare-task",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "Tasks/SSDT.GenerateDeployReport"
+      }
+    }
+  ]
+}

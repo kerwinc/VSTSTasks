@@ -6,3 +6,4 @@ tfx login --service-url "http://devtfs02/DefaultCollection" --authType pat --tok
 # tfx build tasks list
 # tfx build tasks upload --task-path .\SSDT.GenerateDeployReport
 tfx build tasks upload --task-path .\GitflowBranchGate
+# tfx extension create

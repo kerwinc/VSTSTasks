@@ -15,7 +15,7 @@
   "version": {
     "Major": "0",
     "Minor": "1",
-    "Patch": "20"
+    "Patch": "21"
   },
   "minimumAgentVersion": "1.91.0",
   "instanceNameFormat": "Gitflow Branch Gate",
@@ -89,7 +89,7 @@
     {
       "name": "hotfixBranchLimit",
       "type": "string",
-      "label": "Hotfix Branch Limit (count)",
+      "label": "Hotfix branch limit (number of branches)",
       "defaultValue": "1",
       "required": true,
       "helpMarkDown": "Limit the number of hotfix branches.",
@@ -98,7 +98,7 @@
     {
       "name": "hotfixBranchDaysLimit",
       "type": "string",
-      "label": "Hotfix Branches Must Not Be Older Than (days)",
+      "label": "Hotfix branches must not be older than (days)",
       "defaultValue": "10",
       "required": true,
       "helpMarkDown": "",
@@ -107,7 +107,7 @@
     {
       "name": "releaseBranchLimit",
       "type": "string",
-      "label": "Release Branch Limit (count)",
+      "label": "Release branch limit (number of branches)",
       "defaultValue": "1",
       "required": true,
       "helpMarkDown": "Limit the number of release branches.",
@@ -116,7 +116,7 @@
     {
       "name": "releaseBranchDaysLimit",
       "type": "string",
-      "label": "Release Branches Must Not Be Older Than (days)",
+      "label": "Release branches must not be older than (days)",
       "defaultValue": "10",
       "required": true,
       "helpMarkDown": "",
@@ -125,7 +125,7 @@
     {
       "name": "featureBranchLimit",
       "type": "string",
-      "label": "Feature Branch Limit (count)",
+      "label": "Feature branch limit (number of branches)",
       "defaultValue": "50",
       "required": true,
       "helpMarkDown": "Limit the number of feature branches.",
@@ -134,7 +134,7 @@
     {
       "name": "featureBranchDaysLimit",
       "type": "string",
-      "label": "Feature Branches Must Not Be Older Than (days)",
+      "label": "Feature branches must not be older than (days)",
       "defaultValue": "45",
       "required": true,
       "helpMarkDown": "Limit the number of feature branches.",
@@ -143,37 +143,37 @@
     {
       "name": "hotfixMustNotBeBehindMaster",
       "type": "boolean",
-      "label": "Hotfix Branches must not be behind master",
+      "label": "Hotfix branches must not be behind master",
       "defaultValue": "true",
       "required": false,
-      "helpMarkDown": "Hotfix branches must not be behind master",
+      "helpMarkDown": "Turning this on will fail the build if any hotfix branches are behind the master branch.",
       "groupName": "rules"
     },
     {
       "name": "releaseMustNotBeBehindMaster",
       "type": "boolean",
-      "label": "Release Branches must not be behind master",
+      "label": "Release branches must not be behind master",
       "defaultValue": "true",
       "required": false,
-      "helpMarkDown": "Release branches must not be behind master",
+      "helpMarkDown": "Turning this on will fail the build if any release branches are behind the master branch.",
       "groupName": "rules"
     },
     {
       "name": "featureMustNotBeBehindMaster",
       "type": "boolean",
-      "label": "Feature Branches must not be behind master",
+      "label": "Feature branches must not be behind master",
       "defaultValue": "true",
       "required": false,
-      "helpMarkDown": "Feature branches must not be behind master",
+      "helpMarkDown": "Turning this on will fail the build if the current feature branch being built is behind the master branch.",
       "groupName": "rules"
     },
     {
       "name": "featureMustNotBeBehindDevelop",
       "type": "boolean",
-      "label": "Feature Branches must not be behind develop",
+      "label": "Feature branches must not be behind develop",
       "defaultValue": "true",
       "required": false,
-      "helpMarkDown": "Feature branches must not be behind develop",
+      "helpMarkDown": "Turning this on will fail the build if the current feature branch being built is behind the develop branch.",
       "groupName": "rules"
     },
     {
