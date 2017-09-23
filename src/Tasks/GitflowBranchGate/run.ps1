@@ -8,9 +8,14 @@ $projectCollectionUri = $env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI
 $projectName = $env:SYSTEM_TEAMPROJECT
 $buildDefinitionId = $env:SYSTEM_DEFINITIONID
 $repository = Get-VstsInput -Name "repository" -Require
-$currentBranch = ($env:BUILD_SOURCEBRANCHNAME).Replace("refs/heads/", "")
+$currentBranch = ($env:BUILD_SOURCEBRANCH).Replace("refs/heads/", "")
 $env:TEAM_AuthType = Get-VstsInput -Name "authenticationType" -Require
 $env:TEAM_PAT = $env:SYSTEM_ACCESSTOKEN
+
+# $projectCollectionUri = "http://devtfs02/DefaultCollection"
+# $projectName = "RnD"
+# $repository = "RnD"
+# $currentBranch = "develop"
 # $env:TEAM_AUTHTYPE = "OAuthToken"
 # $env:TEAM_PAT = "OjVidjN6Mm1wM2ViYnB0ZnNuYmpxaWV2ajNidDJwcW9hM2xudTZmZnRkaXA2anNhem14NHE="
 
@@ -40,6 +45,32 @@ $rules = New-Object psobject -Property @{
   ReleaseBranchesMustNotHaveActivePullRequests = [System.Convert]::ToBoolean((Get-VstsInput -Name "releaseBranchesMustNotHavePendingPullRequests" -Require))
   BranchNamesMustMatchConventions = [System.Convert]::ToBoolean((Get-VstsInput -Name "branchNamesMustMatchConventions" -Require))
 }
+# $rules = New-Object psobject -Property @{
+#   MasterBranch = "master"
+#   DevelopBranch = "develop"
+#   HotfixPrefix = "hotfix/*"
+#   ReleasePrefix = "release/*"
+#   FeaturePrefix = "feature/*"
+
+#   HotfixBranchLimit = 1
+#   HotfixDaysLimit = 10
+#   ReleaseBranchLimit = 1
+#   ReleaseDaysLimit = 10
+#   FeatureBranchLimit = 50
+#   FeatureDaysLimit = 45
+
+#   HotfixeBranchesMustNotBeBehindMaster = $false
+#   ReleaseBranchesMustNotBeBehindMaster = $false
+#   DevelopMustNotBeBehindMaster = $false
+#   FeatureBranchesMustNotBeBehindMaster = $false
+#   FeatureBranchesMustNotBeBehindDevelop = $false
+#   CurrentFeatureMustNotBeBehindDevelop = $false
+#   MustNotHaveHotfixAndReleaseBranches = $false
+#   MasterMustNotHaveActivePullRequests = $false
+#   HotfixBranchesMustNotHaveActivePullRequests = $false
+#   ReleaseBranchesMustNotHaveActivePullRequests = $false
+#   BranchNamesMustMatchConventions = $false
+# }
 
 Write-Output "Project Collection: [$projectCollectionUri]"
 Write-Output "Project Name: [$projectName]"
@@ -50,14 +81,9 @@ Write-Output "Master Branch: [$($Rules.MasterBranch)]"
 Write-Output "Authentication Type: [$env:TEAM_AUTHTYPE]"
 Write-Output "Rules:"
 $rules
+Write-Output "------------------------------------------------------------------------------"
 
 $scriptLocation = (Get-Item -LiteralPath (Split-Path -Parent $MyInvocation.MyCommand.Path)).FullName
-
-# $projectCollectionUri = "http://devtfs02/DefaultCollection"
-# $projectName = "RnD"
-# $repository = "RnD"
-# $currentBranch = "develop"
-# $env:TEAM_PAT = "5bv3z2mp3ebbptfsnbjqievj3bt2pqoa3lnu6fftdip6jsazmx4q"
 
 #Import Required Modules
 Import-Module "$scriptLocation\ps_modules\Custom\team.Extentions.psm1" -Force
@@ -69,28 +95,30 @@ $branchesComparedToDevelop = Get-BranchStats -ProjectCollectionUri $projectColle
 $branches = Get-BranchStats -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository -BaseBranch $Rules.MasterBranch | ConvertTo-Branches
 $branches = Add-DevelopCompare -Branches $branches -BranchesComparedToDevelop $branchesComparedToDevelop
 
-Write-Output "`nCurrent Branches:"
+Write-Output "Current Branches:"
 Write-Output "------------------------------------------------------------------------------"
 $branches = Add-PullRequests -Branches $branches -PullRequests $pullRequests
 
 $branches = Invoke-BranchRules -Branches $branches -CurrentBranchName $currentBranch -Rules $rules
 $branches | Select-Object BranchName, Master, Develop, Modified, ModifiedBy, StaleDays | Format-Table
 
-$warnings = $branches | Select-Object * -ExpandProperty Errors | Where-Object {$_.Type -eq "Warning"}
+[System.Object[]]$warnings = $branches | Select-Object * -ExpandProperty Errors | Where-Object {$_.Type -eq "Warning"}
 foreach($warning in $warnings){
   Write-Warning "Gitflow Branch Gate: $($warnings.Message)"
 }
 
-$errors = $branches | Select-Object -ExpandProperty Errors | Where-Object {$_.Type -eq "Error"}
+[System.Object[]]$errors = $branches | Select-Object -ExpandProperty Errors | Where-Object {$_.Type -eq "Error"}
 
-Write-Output "`nBranch Gate Summary:"
+Write-Output "------------------------------------------------------------------------------"
+Write-Output "Branch Gate Summary:"
 Write-Output "Total Branches: $($branches.Count)"
 Write-Output "Warnings: $($warnings.Count)"
 Write-Output "Errors: $($errors.Count)"
-
+Write-Output "------------------------------------------------------------------------------"
 
 if ($errors.Count -gt 0) {
-  Write-Output "`nInvalid Branches:"
+
+  Write-Output "Invalid Branches:"
   Write-Output "------------------------------------------------------------------------------"
   $branches | Select-Object -ExpandProperty Errors | Where-Object {$_.Type -eq "Error" } | Select-Object BranchName, Master, Develop, Message | Sort-Object BranchName | Format-Table
   Write-Error "Current branches did not pass the Gitflow Branch Gate."

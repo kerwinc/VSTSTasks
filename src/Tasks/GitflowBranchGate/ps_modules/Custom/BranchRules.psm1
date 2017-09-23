@@ -210,3 +210,30 @@ Function Invoke-BranchRules {
     return $Branches
   }
 }
+
+Function Out-Errors {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+    [System.Object]$Branch,
+    [ValidateNotNullOrEmpty()]
+    [ValidateSet('Info', 'Warning', 'Error')]
+    [Parameter(ParameterSetName = 'List', Mandatory = $true)][string]$Type = "Error"
+  )
+  Process {
+    $item = @()
+    if ($branch.Errors.Count -gt 0) {
+      foreach($branchError in $($branch.Errors))
+      {
+        if ($branchError.Type -eq $Type) {
+          $item += New-Object psobject -Property @{
+            Type = $branchError.Type
+            Message = $branchError.Message
+            BranchName = $branch.BranchName
+          }  
+        }
+      }
+    }
+    return $item
+  }
+}
