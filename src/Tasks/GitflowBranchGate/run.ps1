@@ -102,9 +102,10 @@ $branches = Add-PullRequests -Branches $branches -PullRequests $pullRequests
 $branches = Invoke-BranchRules -Branches $branches -CurrentBranchName $currentBranch -Rules $rules
 $branches | Select-Object BranchName, Master, Develop, Modified, ModifiedBy, StaleDays | Format-Table
 
-[System.Object[]]$warnings = $branches | Select-Object * -ExpandProperty Errors | Where-Object {$_.Type -eq "Warning"}
+# [System.Object[]]$warnings = $branches | Select-Object -ExpandProperty Errors | Where-Object {$_.Type -eq "Warning"}
+[System.Object[]]$warnings = $branches | Out-Errors -Type Warning
 foreach($warning in $warnings){
-  Write-Warning "Gitflow Branch Gate: $($warnings.Message)"
+  Write-Warning "Gitflow Branch Gate: $($warning.Message)"
 }
 
 [System.Object[]]$errors = $branches | Select-Object -ExpandProperty Errors | Where-Object {$_.Type -eq "Error"}

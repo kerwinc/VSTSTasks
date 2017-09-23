@@ -212,7 +212,7 @@ Function Invoke-BranchRules {
 
       if ($Rules.BranchNamesMustMatchConventions -eq $true) {
         if (($branch.BranchName -notlike $Rules.MasterBranch) -and ($branch.BranchName -notlike $Rules.DevelopBranch) -and ($branch.BranchName -notlike $Rules.HotfixPrefix) -and ($branch.BranchName -notlike $Rules.ReleasePrefix) -and ($branch.BranchName -notlike $Rules.FeaturePrefix)) {
-          $branch | Add-Error -Type $type -Message "$($branch.BranchName) does not follow naming convention i.e $($Rule.MasterBranch), $($Rule.DevelopBranch), $($Rule.HotfixPrefix), $($Rule.ReleasePrefix), $($Rule.FeaturePrefix)"
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) branch does not follow naming convention i.e $($Rule.MasterBranch), $($Rule.DevelopBranch), $($Rule.HotfixPrefix), $($Rule.ReleasePrefix), $($Rule.FeaturePrefix)"
         }
       }
 
