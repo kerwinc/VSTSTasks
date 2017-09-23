@@ -9,8 +9,11 @@ Function ConvertTo-Branches {
     foreach ($branch in $Branches) {
       $item = New-Object System.Object
       $item | Add-Member -Type NoteProperty -Name "BranchName" -Value $branch.name
-      $item | Add-Member -Type NoteProperty -Name "Ahead" -Value $branch.aheadCount
-      $item | Add-Member -Type NoteProperty -Name "Behind" -Value $branch.behindCount
+      $item | Add-Member -Type NoteProperty -Name "Master" -Value $(New-Object psobject -Property @{Behind = $branch.behindCount; Ahead = $branch.aheadCount})
+      
+      # $item | Add-Member -Type NoteProperty -Name "Ahead" -Value $branch.aheadCount
+      # $item | Add-Member -Type NoteProperty -Name "Behind" -Value $branch.behindCount
+      $item | Add-Member -Type NoteProperty -Name "Develop" -Value @()
       $item | Add-Member -Type NoteProperty -Name "StaleDays" -Value (New-TimeSpan -Start $branch.commit.author.date -End (Get-Date)).Days
       $item | Add-Member -Type NoteProperty -Name "Modified" -Value $branch.commit.author.date
       $item | Add-Member -Type NoteProperty -Name "ModifiedBy" -Value $branch.commit.author.name
@@ -25,23 +28,6 @@ Function ConvertTo-Branches {
       $item | Add-Member -Type NoteProperty -Name "Errors" -Value @()
       $result += $item
     }
-    # foreach ($branch in $Branches) {
-    #   $item = New-Object psobject -Property @{
-    #     BranchName = $branch.name
-    #     Ahead = $branch.aheadCount
-    #     Behind = $branch.behindCount
-    #     Modified = $branch.commit.author.date
-    #     ModifiedBy = $branch.commit.author.name
-    #     ModifiedByEmail = $branch.commit.author.email
-    #     IsBaseVersion = $branch.isBaseVersion
-    #     SourcePullRequests = 0
-    #     TargetPullRequests = 0
-    #     Status = $null
-    #     SeverityThreshold = "Info"
-    #     Error = @()
-    #   }
-    #   $result += $item
-    # }
     return $result
   }
 }
@@ -90,6 +76,25 @@ Function Add-Error {
   }
 }
 
+Function Add-DevelopCompare {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [System.Object]$Branches,
+    [System.Object]$BranchesComparedToDevelop
+  )
+  Process {
+    foreach ($branch in $Branches) {
+      $branchToDevelop = @($BranchesComparedToDevelop | Where-Object {$_.name -eq $branch.BranchName })
+      $branch.Develop = New-Object psobject -Property @{
+        Behind = $branchToDevelop.behindCount
+        Ahead  = $branchToDevelop.aheadCount
+      }
+    }
+    return $Branches
+  }
+}
+
 Function Add-PullRequests {
   [CmdletBinding()]
   param(
@@ -109,7 +114,7 @@ Function Add-PullRequests {
   }
 }
 
-Function Invoke-BranchCommitRules {
+Function Invoke-BranchRules {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory = $true)]
@@ -122,6 +127,21 @@ Function Invoke-BranchCommitRules {
 
     foreach ($branch in $Branches) {
 
+      if ($branch.BranchName -eq $Rules.MasterBranch) {
+        if ($Rules.MasterMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0) {
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request. Master must not have any pending Pull Requests"
+        }
+        if ($Rules.MasterMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0) {
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch. Master must not have any pending Pull Requests"
+        }
+      }
+
+      if ($branch.BranchName -eq $Rules.DevelopBranch) {
+        if ($Rules.DevelopMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Behind) commit(s) from $($baseBranch.BranchName)"
+        }
+      }
+
       if ($branch.BranchName -like $Rules.HotfixPrefix) {
         if ($Rules.HotfixBranchLimit -lt $($Branches | Where-Object {$_.BranchName -like $Rules.HotfixPrefix}).Count) {
           $branch | Add-Error -Type Error -Message  "Hotfix branch limit reached"
@@ -129,8 +149,14 @@ Function Invoke-BranchCommitRules {
         if ($branch.StaleDays -gt $Rules.HotfixDaysLimit) {
           $branch | Add-Error -Type Error -Message "Hotfix branch days limit reached (stale branch)"
         }
-        if ($Rules.HotfixeBranchesMustNotBeBehindMaster -eq $true -and $branch.Behind -gt 0) {
-          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Behind) commits from $($baseBranch.BranchName)"
+        if ($Rules.HotfixeBranchesMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Behind) commit(s) from $($baseBranch.BranchName)"
+        }
+        if ($Rules.HotfixBranchesMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0) {
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request. Hotfix branches must not have any pending Pull Requests"
+        }
+        if ($Rules.HotfixBranchesMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0) {
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch. Hotfix branches must not have any pending Pull Requests"
         }
       }
 
@@ -141,8 +167,14 @@ Function Invoke-BranchCommitRules {
         if ($branch.StaleDays -gt $Rules.ReleaseDaysLimit) {
           $branch | Add-Error -Type Error -Message "Release branch days limit reached (stale branch)"
         }
-        if ($Rules.ReleaseBranchesMustNotBeBehindMaster -eq $true -and $branch.Behind -gt 0) {
-          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Behind) commits from $($baseBranch.BranchName)"
+        if ($Rules.ReleaseBranchesMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"
+        }
+        if ($Rules.ReleaseBranchesMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0) {
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request. Release branches must not have any pending Pull Requests"
+        }
+        if ($Rules.ReleaseBranchesMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0) {
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch. Release branches must not have any pending Pull Requests"
         }
       }
 
@@ -153,49 +185,27 @@ Function Invoke-BranchCommitRules {
         if ($branch.StaleDays -gt $Rules.FeatureDaysLimit) {
           $branch | Add-Error -Type Error -Message "Feature branch days limit reached (stale branch)"
         }
+        if ($Rules.FeatureBranchesMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"
+        }
+        if ($branch.Develop.Behind -gt 0) {
+          $type = "Warning"
+          if ($Rules.FeatureBranchesMustNotBeBehindDevelop -eq $true) {
+            $type = "Error"
+          }
+          if ($Rules.CurrentFeatureMustNotBeBehindDevelop -eq $true -and $branch.BranchName -eq $CurrentBranchName) {
+            $type = "Error"
+          }
+          $branch | Add-Error -Type $type -Message "$($branch.BranchName) is missing $($branch.Develop.Behind) commit(s) from develop"  
+        }
       }
 
-      Write-Verbose "Checking if any branches are behind master"
-      # if ($branch.Behind -gt 0) {
-      #   $branch.status = "Invalid"
-      #   if ($branch.BranchName -like $CurrentBranchName) {
-      #     $branch.SeverityThreshold = "Error"
-      #   }
-      #   else {
-      #     $branch.SeverityThreshold = "Warning"
-      #   }
-      #   $branch.Errors += "$($branch.BranchName) is missing $($branch.Behind) commits from $($baseBranch.BranchName)"
-      # }
-      # else {
-      #   $branch.Status = "Valid"
-      # }
-    }
-    return $Branches
-  }
-}
-
-Function Invoke-LimitRules {
-  [CmdletBinding()]
-  param(
-    # [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
-    [Parameter(Mandatory = $true)]
-    [System.Object]$Branches,
-    [string]$CurrentBranchName
-  )
-  Process {
-    $baseBranch = $Branches | Where-Object { $_.IsBaseVersion -eq "True" }
-
-    foreach ($branch in $Branches) {
-      if ($branch.Behind -gt 0) {
-        $branch.status = "Invalid"
-        if ($branch.BranchName -like $CurrentBranchName) {
-          $branch.SeverityThreshold = "Error"
+      if ($Rules.BranchNamesMustMatchConventions -eq $true) {
+        if (($branch.BranchName -notlike $Rules.MasterBranch) -and ($branch.BranchName -notlike $Rules.DevelopBranch) -and ($branch.BranchName -notlike $Rules.HotfixPrefix) -and ($branch.BranchName -notlike $Rules.ReleasePrefix) -and ($branch.BranchName -notlike $Rules.FeaturePrefix)) {
+          $branch | Add-Error -Type $type -Message "$($branch.BranchName) does not follow naming convention i.e $($Rule.MasterBranch), $($Rule.DevelopBranch), $($Rule.HotfixPrefix), $($Rule.ReleasePrefix), $($Rule.FeaturePrefix)"
         }
-        else {
-          $branch.SeverityThreshold = "Warning"
-        }
-        $branch.Errors += "$($branch.BranchName) is missing $($branch.Behind) commits from $($baseBranch.BranchName)"
       }
+
     }
     return $Branches
   }
