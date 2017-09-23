@@ -81,7 +81,6 @@ Function Get-VSTSBuild {
     [Parameter(Mandatory = $true)][int] $BuildId
   )
   Process {
-
     $resultString = (Invoke-RestMethod -Uri "$baseUrl/_apis/build/builds/$BuildId/" -Headers @{Authorization = "Basic $env:TEAM_PAT"})
     $jsonResult = $resultString
     $jsonResult

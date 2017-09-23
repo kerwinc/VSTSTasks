@@ -15,14 +15,14 @@
   "version": {
     "Major": "0",
     "Minor": "1",
-    "Patch": "21"
+    "Patch": "25"
   },
   "minimumAgentVersion": "1.91.0",
   "instanceNameFormat": "Gitflow Branch Gate",
   "groups": [
     {
       "name": "branches",
-      "displayName": "Git Flow Branches",
+      "displayName": "Gitflow Branches",
       "isExpanded": true
     },
     {
