@@ -149,6 +149,11 @@ Function Invoke-BranchRules {
         if ($branch.StaleDays -gt $Rules.HotfixDaysLimit) {
           $branch | Add-Error -Type Error -Message "Hotfix branch days limit reached (stale branch)"
         }
+
+        if ($Rules.MustNotHaveHotfixAndReleaseBranches -eq $true -and $($Branches | Where-Object {$_.BranchName -like $Rules.ReleasePrefix}).Count -gt 0) {
+          $branch | Add-Error -Type Error -Message "Must not have hotfix and release branches at the same time"
+        }
+
         if ($Rules.HotfixeBranchesMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Behind) commit(s) from $($baseBranch.BranchName)"
         }
@@ -167,6 +172,11 @@ Function Invoke-BranchRules {
         if ($branch.StaleDays -gt $Rules.ReleaseDaysLimit) {
           $branch | Add-Error -Type Error -Message "Release branch days limit reached (stale branch)"
         }
+
+        if ($Rules.MustNotHaveHotfixAndReleaseBranches -eq $true -and $($Branches | Where-Object {$_.BranchName -like $Rules.HotfixPrefix}).Count -gt 0) {
+          $branch | Add-Error -Type Error -Message "Must not have hotfix and release branches at the same time"
+        }
+
         if ($Rules.ReleaseBranchesMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"
         }
@@ -223,12 +233,11 @@ Function Out-Errors {
   Process {
     $item = @()
     if ($branch.Errors.Count -gt 0) {
-      foreach($branchError in $($branch.Errors))
-      {
+      foreach ($branchError in $($branch.Errors)) {
         if ($branchError.Type -eq $Type) {
           $item += New-Object psobject -Property @{
-            Type = $branchError.Type
-            Message = $branchError.Message
+            Type       = $branchError.Type
+            Message    = $branchError.Message
             BranchName = $branch.BranchName
           }  
         }
