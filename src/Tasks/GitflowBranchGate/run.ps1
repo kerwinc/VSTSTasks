@@ -108,7 +108,7 @@ foreach($warning in $warnings){
   Write-Warning "Gitflow Branch Gate: $($warning.Message)"
 }
 
-[System.Object[]]$errors = $branches | Select-Object -ExpandProperty Errors | Where-Object {$_.Type -eq "Error"}
+[System.Object[]]$errors = $branches | Select-Object * -ExpandProperty Errors | Where-Object {$_.Type -eq "Error"}
 
 Write-Output "------------------------------------------------------------------------------"
 Write-Output "Branch Gate Summary:"
