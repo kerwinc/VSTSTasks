@@ -10,8 +10,12 @@ function Invoke-GetCommand {
       $responseFromGet = Invoke-RestMethod -Uri $Url -UseDefaultCredentials
       return $responseFromGet
     }
-    else {
+    elseif ($env:TEAM_AUTHTYPE -eq "Basic" ) {
       $responseFromGet = Invoke-RestMethod -Uri $Url -Method Get -ContentType "application/json" -Headers @{Authorization = "Basic $env:TEAM_PAT"}
+      return $responseFromGet
+    }
+    else {
+      $responseFromGet = Invoke-RestMethod -Uri $Url -Method Get -ContentType "application/json" -Headers @{Authorization = "Bearer $env:TEAM_PAT"}
       return $responseFromGet
     }
   }

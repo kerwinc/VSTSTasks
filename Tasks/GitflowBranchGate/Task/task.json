@@ -10,12 +10,14 @@
     "Build",
     "Release"
   ],
-  "runsOn": ["Agent"],
+  "runsOn": [
+    "Agent"
+  ],
   "demands": [],
   "version": {
     "Major": "0",
-    "Minor": "1",
-    "Patch": "96"
+    "Minor": "2",
+    "Patch": "16"
   },
   "minimumAgentVersion": "1.91.0",
   "instanceNameFormat": "Gitflow Branch Gate",
@@ -253,9 +255,9 @@
       "type": "pickList",
       "label": "Authentication",
       "required": "true",
-      "defaultValue": "OAuth Token",
+      "defaultValue": "OAuthToken",
       "options": {
-        "OAuthToken":"OAuth Token",
+        "OAuthToken": "OAuth Token",
         "WindowsAuthentication": "Windows Authentication"
       },
       "helpMarkDown": "Specify the authentication type to use for communicating with API. Note: For OAuth Token, 'Allow scripts to access OAuth token' must be enabled in the build definition options. If 'Windows Authentication' is selected, this would be the account being used by the Build Agent.",

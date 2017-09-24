@@ -1,7 +1,7 @@
 Function ConvertTo-Branches {
   [CmdletBinding()]
   param(
-    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+    [Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
     [System.Object]$Branches
   )
   Process {
@@ -33,7 +33,7 @@ Function ConvertTo-Branches {
 Function ConvertTo-PullRequests {
   [CmdletBinding()]
   param(
-    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+    [Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
     [System.Object]$PullRequests
   )
   Process {
@@ -127,10 +127,10 @@ Function Invoke-BranchRules {
 
       if ($branch.BranchName -eq $Rules.MasterBranch) {
         if ($Rules.MasterMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0) {
-          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request. Master must not have any pending Pull Requests"
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request."
         }
         if ($Rules.MasterMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0) {
-          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch. Master must not have any pending Pull Requests"
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch."
         }
       }
 
@@ -156,10 +156,10 @@ Function Invoke-BranchRules {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Behind) commit(s) from $($baseBranch.BranchName)"
         }
         if ($Rules.HotfixBranchesMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0) {
-          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request. Hotfix branches must not have any pending Pull Requests"
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request."
         }
         if ($Rules.HotfixBranchesMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0) {
-          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch. Hotfix branches must not have any pending Pull Requests"
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch."
         }
       }
 
@@ -179,10 +179,10 @@ Function Invoke-BranchRules {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"
         }
         if ($Rules.ReleaseBranchesMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0) {
-          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request. Release branches must not have any pending Pull Requests"
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request."
         }
         if ($Rules.ReleaseBranchesMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0) {
-          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch. Release branches must not have any pending Pull Requests"
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch."
         }
       }
 
@@ -261,13 +261,18 @@ Function Write-OutputCurrentBranches {
 Function Write-OutputPullRequests {
   [CmdletBinding()]
   param(
-    [Parameter(Mandatory = $true)][System.Object[]]$PullRequests
+    [Parameter()][System.Object[]]$PullRequests
   )
   Process {
     Write-Output "------------------------------------------------------------------------------"
     Write-Output "Active Pull Requests:"
     Write-Output "------------------------------------------------------------------------------"
-    $PullRequests | Select-Object ID, CreatedBy, SourceBranch, TargetBranch, Created | Format-Table
+    if($PullRequests -ne $null -and $PullRequests.Count -gt 0){
+      $PullRequests | Select-Object ID, CreatedBy, SourceBranch, TargetBranch, Created | Format-Table
+    }
+    else {
+      Write-Output "There are no active Pull Requests at the moment..."
+    }
   }
 }
 

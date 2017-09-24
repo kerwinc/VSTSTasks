@@ -17,7 +17,7 @@ $stagingDirectory = $env:BUILD_STAGINGDIRECTORY
 # $projectName = "RnD"
 # $repository = "RnD"
 # $currentBranch = "develop"
-# $env:TEAM_AUTHTYPE = "OAuthToken"
+# $env:TEAM_AUTHTYPE = "Basic"
 # $env:TEAM_PAT = "OjVidjN6Mm1wM2ViYnB0ZnNuYmpxaWV2ajNidDJwcW9hM2xudTZmZnRkaXA2anNhem14NHE="
 
 $rules = New-Object psobject -Property @{

@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "GitflowBranchGate",
   "name": "Gitflow Branch Gate",
-  "version": "0.1.100",
+  "version": "0.2.16",
   "publisher": "kerwincarpede",
   "public": false,
   "repository": {
@@ -14,7 +14,7 @@
       "id": "Microsoft.VisualStudio.Services"
     }
   ],
-  "description": "A build gate to help you prevent stale branches",
+  "description": "A branch gate build task to help you prevent stale branches and avoid rolling back changes",
   "categories": [
     "Build and release"
   ],
@@ -59,8 +59,8 @@
     }
   },
   "branding": {
-    "color": "#8E44AD",
-    "theme": "#ffffff"
+    "color": "rgb(126, 62, 152)",
+    "theme": "dark"
   },
   "icons": {
     "default": "images/extension-icon.png"
