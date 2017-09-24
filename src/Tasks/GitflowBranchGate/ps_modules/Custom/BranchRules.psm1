@@ -43,10 +43,11 @@ Function ConvertTo-PullRequests {
     foreach ($pullRequest in $PullRequests) {
       $item = New-Object System.Object
       $item | Add-Member -Type NoteProperty -Name "ID" -Value $pullRequest.pullRequestId
+      $item | Add-Member -Type NoteProperty -Name "Title" -Value $pullRequest.title
       $item | Add-Member -Type NoteProperty -Name "SourceBranch" -Value $($pullRequest.sourceRefName.Replace("refs/heads/", ""))
       $item | Add-Member -Type NoteProperty -Name "TargetBranch" -Value $($pullRequest.targetRefName.Replace("refs/heads/", ""))
       $item | Add-Member -Type NoteProperty -Name "Created" -Value $pullRequest.creationDate
-      # $item | Add-Member -Type NoteProperty -Name "CreatedBy" -Value $pullRequest.
+      $item | Add-Member -Type NoteProperty -Name "CreatedBy" -Value $pullRequest.createdBy.displayName
 
       $item | Add-Member -Type NoteProperty -Name "Status" -Value $pullRequest.status
       $item | Add-Member -Type NoteProperty -Name "SeverityThreshold" -Value "Info"
@@ -103,7 +104,6 @@ Function Add-PullRequests {
     [System.Object]$PullRequests
   )
   Process {
-
     if ($PullRequests -and $PullRequests.Count -gt 0 ) {
       foreach ($branch in $Branches) {
         $branch.SourcePullRequests = @($PullRequests | Where-Object {$_.SourceBranch -eq $branch.BranchName }).Count

@@ -20,30 +20,30 @@ $env:TEAM_PAT = $env:SYSTEM_ACCESSTOKEN
 # $env:TEAM_PAT = "OjVidjN6Mm1wM2ViYnB0ZnNuYmpxaWV2ajNidDJwcW9hM2xudTZmZnRkaXA2anNhem14NHE="
 
 $rules = New-Object psobject -Property @{
-  MasterBranch = Get-VstsInput -Name "masterBranch" -Require
-  DevelopBranch = Get-VstsInput -Name "developBranch" -Require
-  HotfixPrefix = Get-VstsInput -Name "hotfixBranches" -Require
-  ReleasePrefix = Get-VstsInput -Name "releaseBranches" -Require
-  FeaturePrefix = Get-VstsInput -Name "featureBranches" -Require
+  MasterBranch                                 = Get-VstsInput -Name "masterBranch" -Require
+  DevelopBranch                                = Get-VstsInput -Name "developBranch" -Require
+  HotfixPrefix                                 = Get-VstsInput -Name "hotfixBranches" -Require
+  ReleasePrefix                                = Get-VstsInput -Name "releaseBranches" -Require
+  FeaturePrefix                                = Get-VstsInput -Name "featureBranches" -Require
 
-  HotfixBranchLimit = [System.Convert]::ToInt32((Get-VstsInput -Name "hotfixBranchLimit" -Require))
-  HotfixDaysLimit =[System.Convert]::ToInt32((Get-VstsInput -Name "hotfixBranchDaysLimit" -Require))
-  ReleaseBranchLimit = [System.Convert]::ToInt32((Get-VstsInput -Name "releaseBranchLimit" -Require))
-  ReleaseDaysLimit = [System.Convert]::ToInt32((Get-VstsInput -Name "releaseBranchDaysLimit" -Require))
-  FeatureBranchLimit = [System.Convert]::ToInt32((Get-VstsInput -Name "featureBranchLimit" -Require))
-  FeatureDaysLimit = [System.Convert]::ToInt32((Get-VstsInput -Name "featureBranchDaysLimit" -Require))
+  HotfixBranchLimit                            = [System.Convert]::ToInt32((Get-VstsInput -Name "hotfixBranchLimit" -Require))
+  HotfixDaysLimit                              = [System.Convert]::ToInt32((Get-VstsInput -Name "hotfixBranchDaysLimit" -Require))
+  ReleaseBranchLimit                           = [System.Convert]::ToInt32((Get-VstsInput -Name "releaseBranchLimit" -Require))
+  ReleaseDaysLimit                             = [System.Convert]::ToInt32((Get-VstsInput -Name "releaseBranchDaysLimit" -Require))
+  FeatureBranchLimit                           = [System.Convert]::ToInt32((Get-VstsInput -Name "featureBranchLimit" -Require))
+  FeatureDaysLimit                             = [System.Convert]::ToInt32((Get-VstsInput -Name "featureBranchDaysLimit" -Require))
 
-  HotfixeBranchesMustNotBeBehindMaster = [System.Convert]::ToBoolean((Get-VstsInput -Name "hotfixMustNotBeBehindMaster" -Require))
-  ReleaseBranchesMustNotBeBehindMaster = [System.Convert]::ToBoolean((Get-VstsInput -Name "releaseMustNotBeBehindMaster" -Require))
-  DevelopMustNotBeBehindMaster = [System.Convert]::ToBoolean((Get-VstsInput -Name "developMustNotBeBehindMaster" -Require))
-  FeatureBranchesMustNotBeBehindMaster = [System.Convert]::ToBoolean((Get-VstsInput -Name "featureBranchesMustNotBeBehindMaster" -Require))
-  FeatureBranchesMustNotBeBehindDevelop = [System.Convert]::ToBoolean((Get-VstsInput -Name "featureBranchesMustNotBeBehindDevelop" -Require))
-  CurrentFeatureMustNotBeBehindDevelop = [System.Convert]::ToBoolean((Get-VstsInput -Name "CurrentFeatureMustNotBeBehindDevelop" -Require))
-  MustNotHaveHotfixAndReleaseBranches = [System.Convert]::ToBoolean((Get-VstsInput -Name "mustNotHaveHotfixAndReleaseBranches" -Require))
-  MasterMustNotHaveActivePullRequests = [System.Convert]::ToBoolean((Get-VstsInput -Name "masterMustNotHavePendingPullRequests" -Require))
-  HotfixBranchesMustNotHaveActivePullRequests = [System.Convert]::ToBoolean((Get-VstsInput -Name "hotfixBranchesMustNotHavePendingPullRequests" -Require))
+  HotfixeBranchesMustNotBeBehindMaster         = [System.Convert]::ToBoolean((Get-VstsInput -Name "hotfixMustNotBeBehindMaster" -Require))
+  ReleaseBranchesMustNotBeBehindMaster         = [System.Convert]::ToBoolean((Get-VstsInput -Name "releaseMustNotBeBehindMaster" -Require))
+  DevelopMustNotBeBehindMaster                 = [System.Convert]::ToBoolean((Get-VstsInput -Name "developMustNotBeBehindMaster" -Require))
+  FeatureBranchesMustNotBeBehindMaster         = [System.Convert]::ToBoolean((Get-VstsInput -Name "featureBranchesMustNotBeBehindMaster" -Require))
+  FeatureBranchesMustNotBeBehindDevelop        = [System.Convert]::ToBoolean((Get-VstsInput -Name "featureBranchesMustNotBeBehindDevelop" -Require))
+  CurrentFeatureMustNotBeBehindDevelop         = [System.Convert]::ToBoolean((Get-VstsInput -Name "CurrentFeatureMustNotBeBehindDevelop" -Require))
+  MustNotHaveHotfixAndReleaseBranches          = [System.Convert]::ToBoolean((Get-VstsInput -Name "mustNotHaveHotfixAndReleaseBranches" -Require))
+  MasterMustNotHaveActivePullRequests          = [System.Convert]::ToBoolean((Get-VstsInput -Name "masterMustNotHavePendingPullRequests" -Require))
+  HotfixBranchesMustNotHaveActivePullRequests  = [System.Convert]::ToBoolean((Get-VstsInput -Name "hotfixBranchesMustNotHavePendingPullRequests" -Require))
   ReleaseBranchesMustNotHaveActivePullRequests = [System.Convert]::ToBoolean((Get-VstsInput -Name "releaseBranchesMustNotHavePendingPullRequests" -Require))
-  BranchNamesMustMatchConventions = [System.Convert]::ToBoolean((Get-VstsInput -Name "branchNamesMustMatchConventions" -Require))
+  BranchNamesMustMatchConventions              = [System.Convert]::ToBoolean((Get-VstsInput -Name "branchNamesMustMatchConventions" -Require))
 }
 # $rules = New-Object psobject -Property @{
 #   MasterBranch = "master"
@@ -81,7 +81,6 @@ Write-Output "Master Branch: [$($Rules.MasterBranch)]"
 Write-Output "Authentication Type: [$env:TEAM_AUTHTYPE]"
 Write-Output "Rules:"
 $rules
-Write-Output "------------------------------------------------------------------------------"
 
 $scriptLocation = (Get-Item -LiteralPath (Split-Path -Parent $MyInvocation.MyCommand.Path)).FullName
 
@@ -94,18 +93,27 @@ $pullRequests = Get-PullRequests -ProjectCollectionUri $projectCollectionUri -Pr
 $branchesComparedToDevelop = Get-BranchStats -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository -BaseBranch $Rules.DevelopBranch
 $branches = Get-BranchStats -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository -BaseBranch $Rules.MasterBranch | ConvertTo-Branches
 $branches = Add-DevelopCompare -Branches $branches -BranchesComparedToDevelop $branchesComparedToDevelop
+$branches = Add-PullRequests -Branches $branches -PullRequests $pullRequests
+$branches = Invoke-BranchRules -Branches $branches -CurrentBranchName $currentBranch -Rules $rules
 
+Write-Output "------------------------------------------------------------------------------"
 Write-Output "Current Branches:"
 Write-Output "------------------------------------------------------------------------------"
-$branches = Add-PullRequests -Branches $branches -PullRequests $pullRequests
-
-$branches = Invoke-BranchRules -Branches $branches -CurrentBranchName $currentBranch -Rules $rules
 $branches | Select-Object BranchName, Master, Develop, Modified, ModifiedBy, StaleDays | Format-Table
 
-# [System.Object[]]$warnings = $branches | Select-Object -ExpandProperty Errors | Where-Object {$_.Type -eq "Warning"}
+Write-Output "------------------------------------------------------------------------------"
+Write-Output "Active Pull Requests:"
+Write-Output "------------------------------------------------------------------------------"
+$pullRequests | Select-Object ID, CreatedBy, SourceBranch, TargetBranch, Created | Format-Table
+
 [System.Object[]]$warnings = $branches | Out-Errors -Type Warning
-foreach($warning in $warnings){
-  Write-Warning "Gitflow Branch Gate: $($warning.Message)"
+if ($warnings.Count -gt 0) {
+  Write-Output "------------------------------------------------------------------------------"
+  Write-Output "Warnings:"
+  Write-Output "------------------------------------------------------------------------------"  
+  foreach ($warning in $warnings) {
+    Write-Warning "Gitflow Branch Gate: $($warning.Message)"
+  }
 }
 
 [System.Object[]]$errors = $branches | Select-Object * -ExpandProperty Errors | Where-Object {$_.Type -eq "Error"}
@@ -119,13 +127,13 @@ Write-Output "------------------------------------------------------------------
 
 if ($errors.Count -gt 0) {
 
-  Write-Output "Invalid Branches:"
+  Write-Output "Branches with Errors:"
   Write-Output "------------------------------------------------------------------------------"
-  $branches | Select-Object -ExpandProperty Errors | Where-Object {$_.Type -eq "Error" } | Select-Object BranchName, Master, Develop, Message | Sort-Object BranchName | Format-Table
-  Write-Error "Current branches did not pass the Gitflow Branch Gate."
+  $branches | Select-Object -ExpandProperty Errors | Where-Object {$_.Type -eq "Error" } | Select-Object BranchName, Message | Sort-Object BranchName | Format-List
+  Write-Error "Current branches did not pass the Gitflow Branch Gate rules."
 }
 else {
-  Write-Output "Branches passed the Gitflow Branch Gate. Nice."
+  Write-Output "Branches passed the Gitflow Branch Gate rules."
 }
 
 Trace-VstsLeavingInvocation $MyInvocation
