@@ -60,7 +60,7 @@
   },
   "branding": {
     "color": "#8E44AD",
-    "theme": "light"
+    "theme": "#ffffff"
   },
   "icons": {
     "default": "images/extension-icon.png"
