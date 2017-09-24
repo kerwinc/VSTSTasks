@@ -11,8 +11,6 @@ Function ConvertTo-Branches {
       $item | Add-Member -Type NoteProperty -Name "BranchName" -Value $branch.name
       $item | Add-Member -Type NoteProperty -Name "Master" -Value $(New-Object psobject -Property @{Behind = $branch.behindCount; Ahead = $branch.aheadCount})
       
-      # $item | Add-Member -Type NoteProperty -Name "Ahead" -Value $branch.aheadCount
-      # $item | Add-Member -Type NoteProperty -Name "Behind" -Value $branch.behindCount
       $item | Add-Member -Type NoteProperty -Name "Develop" -Value @()
       $item | Add-Member -Type NoteProperty -Name "StaleDays" -Value (New-TimeSpan -Start $branch.commit.author.date -End (Get-Date)).Days
       $item | Add-Member -Type NoteProperty -Name "Modified" -Value $branch.commit.author.date
@@ -231,7 +229,7 @@ Function Out-Errors {
     [Parameter(ParameterSetName = 'List', Mandatory = $true)][string]$Type = "Error"
   )
   Process {
-    $item = @()
+    [System.Object]$item = @()
     if ($branch.Errors.Count -gt 0) {
       foreach ($branchError in $($branch.Errors)) {
         if ($branchError.Type -eq $Type) {
@@ -244,5 +242,127 @@ Function Out-Errors {
       }
     }
     return $item
+  }
+}
+
+Function Write-OutputCurrentBranches {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)][System.Object[]]$Branches
+  )
+  Process {
+    Write-Output "------------------------------------------------------------------------------"
+    Write-Output "Current Branches:"
+    Write-Output "------------------------------------------------------------------------------"
+    $Branches | Select-Object BranchName, Master, Develop, Modified, ModifiedBy, StaleDays | Format-Table
+  }
+}
+
+Function Write-OutputPullRequests {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)][System.Object[]]$PullRequests
+  )
+  Process {
+    Write-Output "------------------------------------------------------------------------------"
+    Write-Output "Active Pull Requests:"
+    Write-Output "------------------------------------------------------------------------------"
+    $PullRequests | Select-Object ID, CreatedBy, SourceBranch, TargetBranch, Created | Format-Table
+  }
+}
+
+Function Write-OutputWarnings {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)][System.Object[]]$Branches
+  )
+  Process {
+    [System.Object[]]$warnings = $Branches | Out-Errors -Type Warning
+    if ($warnings.Count -gt 0) {
+      Write-Output "------------------------------------------------------------------------------"
+      Write-Output "Warnings:"
+      Write-Output "------------------------------------------------------------------------------"  
+      foreach ($warning in $warnings) {
+        Write-Warning "Gitflow Branch Gate: $($warning.Message)"
+      }
+    }
+  }
+}
+
+Function Write-OutputSummary {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)][System.Object[]]$Branches
+  )
+  Process {
+    [System.Object[]]$errors = $Branches | Out-Errors -Type Error
+    [System.Object[]]$warnings = $Branches | Out-Errors -Type Warning
+   
+    Write-Output "------------------------------------------------------------------------------"
+    Write-Output "Branch Gate Summary:"
+    Write-Output "Total Branches: $($branches.Count)"
+    Write-Output "Warnings: $($warnings.Count)"
+    Write-Output "Errors: $($errors.Count)"
+    Write-Output "------------------------------------------------------------------------------"
+  }
+}
+
+Function Write-OutputErrors {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)][System.Object[]]$Branches
+  )
+  Process {
+    [System.Object[]]$errors = $Branches | Out-Errors -Type Error 
+    if ($errors.Count -gt 0) {
+      Write-Output "------------------------------------------------------------------------------"
+      Write-Output "Branches with Errors:"
+      Write-Output "------------------------------------------------------------------------------"
+      $branches | Select-Object * -ExpandProperty Errors | Where-Object {$_.Type -eq "Error" } | Select-Object BranchName, Message | Sort-Object BranchName | Format-Table -Wrap
+      Write-Error "Current branches did not pass the Gitflow Branch Gate rules."
+    }
+    else {
+      Write-Output "Branches passed the Gitflow Branch Gate rules."
+    }
+  }
+}
+
+Function Invoke-ReportSummary {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)][System.Object[]]$Branches,
+    [Parameter(Mandatory = $true)][string]$TemplatePath,
+    [Parameter(Mandatory = $true)][string]$ReportDestination
+  )
+  Process {
+    [System.Object[]]$errors = $Branches | Out-Errors -Type Error
+    [System.Object[]]$warnings = $Branches | Out-Errors -Type Warning
+
+    $summaryContent = Get-Content -Path $TemplatePath
+
+    $staleDaysMeasure = $Branches | Measure-Object -Property StaleDays -Minimum -Maximum -Average
+    
+    $summaryContent = $summaryContent.Replace("@@TotalBranches@@", $branches.Count)
+    $summaryContent = $summaryContent.Replace("@@TotalWarnings@@", $warnings.Count)
+    $summaryContent = $summaryContent.Replace("@@TotalErrors@@", $errors.Count)
+    $summaryContent = $summaryContent.Replace("@@ActivePullRequests@@", $pullRequests.Count)
+    $summaryContent = $summaryContent.Replace("@@MaxStaleDays@@", $staleDaysMeasure.Maximum)
+    $summaryContent = $summaryContent.Replace("@@MinStaleDays@@", $staleDaysMeasure.Minimum)
+    $summaryContent = $summaryContent.Replace("@@AvgStaleDays@@", $staleDaysMeasure.Average)
+    
+    if ($errors.Count -gt 0) {
+      $summaryContent = $summaryContent.Replace("@@GateResult@@", "<span style='color:#fff;Background-Color:#e80303;padding:5px 8px;'>Failed</span>")
+      $issuesUl = "### Issues:`n"
+      foreach($branchError in $errors){
+        $issuesUl += "- $($branchError.Message)`n"
+      }
+      $summaryContent = $summaryContent.Replace("@@Issues@@", $issuesUl)
+    }
+    else {
+      $summaryContent = $summaryContent.Replace("@@GateResult@@", "<span style='color:#fff;Background-Color:#00c700;padding:5px 5px;'>Passed</span>")
+      $summaryContent = $summaryContent.Replace("@@Issues@@", "Not issues found")
+    }
+    
+    Set-Content -Path $ReportDestination -Value $summaryContent
   }
 }

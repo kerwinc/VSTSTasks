@@ -11,6 +11,7 @@ $repository = Get-VstsInput -Name "repository" -Require
 $currentBranch = ($env:BUILD_SOURCEBRANCH).Replace("refs/heads/", "")
 $env:TEAM_AuthType = Get-VstsInput -Name "authenticationType" -Require
 $env:TEAM_PAT = $env:SYSTEM_ACCESSTOKEN
+$stagingDirectory = $env:BUILD_STAGINGDIRECTORY
 
 # $projectCollectionUri = "http://devtfs02/DefaultCollection"
 # $projectName = "RnD"
@@ -89,51 +90,22 @@ Import-Module "$scriptLocation\ps_modules\Custom\team.Extentions.psm1" -Force
 Import-Module "$scriptLocation\ps_modules\Custom\BranchRules.psm1" -Force
 
 #Get All Branches
-$pullRequests = Get-PullRequests -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository -StatusFilter Active | ConvertTo-PullRequests
-$branchesComparedToDevelop = Get-BranchStats -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository -BaseBranch $Rules.DevelopBranch
-$branches = Get-BranchStats -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository -BaseBranch $Rules.MasterBranch | ConvertTo-Branches
+[System.Object[]]$pullRequests = Get-PullRequests -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository -StatusFilter Active | ConvertTo-PullRequests
+[System.Object[]]$branchesComparedToDevelop = Get-BranchStats -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository -BaseBranch $Rules.DevelopBranch
+[System.Object[]]$branches = Get-BranchStats -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository -BaseBranch $Rules.MasterBranch | ConvertTo-Branches
 $branches = Add-DevelopCompare -Branches $branches -BranchesComparedToDevelop $branchesComparedToDevelop
 $branches = Add-PullRequests -Branches $branches -PullRequests $pullRequests
 $branches = Invoke-BranchRules -Branches $branches -CurrentBranchName $currentBranch -Rules $rules
 
-Write-Output "------------------------------------------------------------------------------"
-Write-Output "Current Branches:"
-Write-Output "------------------------------------------------------------------------------"
-$branches | Select-Object BranchName, Master, Develop, Modified, ModifiedBy, StaleDays | Format-Table
+Write-OutputCurrentBranches -Branches $Branches
+Write-OutputPullRequests -PullRequests $pullRequests
+Write-OutputWarnings -Branches $Branches
 
-Write-Output "------------------------------------------------------------------------------"
-Write-Output "Active Pull Requests:"
-Write-Output "------------------------------------------------------------------------------"
-$pullRequests | Select-Object ID, CreatedBy, SourceBranch, TargetBranch, Created | Format-Table
+$summaryTitle = "Gitflow Branch Gate Report"
+$summaryFilePath = "$stagingDirectory\GitflowBranchGate.ReportSummary.md"
+Invoke-ReportSummary -Branches $branches -TemplatePath "$scriptLocation\ReportSummary.md" -ReportDestination $summaryFilePath
+Write-Host "##vso[task.addattachment type=Distributedtask.Core.Summary;name=$summaryTitle;]$summaryFilePath"
 
-[System.Object[]]$warnings = $branches | Out-Errors -Type Warning
-if ($warnings.Count -gt 0) {
-  Write-Output "------------------------------------------------------------------------------"
-  Write-Output "Warnings:"
-  Write-Output "------------------------------------------------------------------------------"  
-  foreach ($warning in $warnings) {
-    Write-Warning "Gitflow Branch Gate: $($warning.Message)"
-  }
-}
-
-[System.Object[]]$errors = $branches | Select-Object * -ExpandProperty Errors | Where-Object {$_.Type -eq "Error"}
-
-Write-Output "------------------------------------------------------------------------------"
-Write-Output "Branch Gate Summary:"
-Write-Output "Total Branches: $($branches.Count)"
-Write-Output "Warnings: $($warnings.Count)"
-Write-Output "Errors: $($errors.Count)"
-Write-Output "------------------------------------------------------------------------------"
-
-if ($errors.Count -gt 0) {
-
-  Write-Output "Branches with Errors:"
-  Write-Output "------------------------------------------------------------------------------"
-  $branches | Select-Object -ExpandProperty Errors | Where-Object {$_.Type -eq "Error" } | Select-Object BranchName, Message | Sort-Object BranchName | Format-List
-  Write-Error "Current branches did not pass the Gitflow Branch Gate rules."
-}
-else {
-  Write-Output "Branches passed the Gitflow Branch Gate rules."
-}
+Write-OutputErrors -Branches $Branches
 
 Trace-VstsLeavingInvocation $MyInvocation
