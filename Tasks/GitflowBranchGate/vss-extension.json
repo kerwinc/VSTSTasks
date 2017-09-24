@@ -1,39 +1,42 @@
 {
   "manifestVersion": 1,
-  "id": "devbraino-buildtasks",
-  "name": "Colin's ALM Corner Build & Release Tools",
-  "version": "0.1.22",
-  "publisher": "Kerwin Carpede",
-  "public": true,
+  "id": "GitflowBranchGate",
+  "name": "Gitflow Branch Gate",
+  "version": "0.1.100",
+  "publisher": "kerwincarpede",
+  "public": false,
   "repository": {
     "type": "git",
-    "uri": "https://github.com/kerwinc/VSTSTasks"
+    "uri": "https://github.com/kerwinc/VSTSTasks/Tasks/GitflowBranchGate"
   },
   "targets": [
     {
       "id": "Microsoft.VisualStudio.Services"
     }
   ],
-  "description": "Build extensions for Team Services and Team Foundation Server",
+  "description": "A build gate to help you prevent stale branches",
   "categories": [
     "Build and release"
   ],
   "tags": [
     "Gates",
     "Gitflow",
-    "build",
-    "dacpac",
-    "SSDT"
+    "Build",
+    "Rules",
+    "Stale Branches"
   ],
   "screenshots": [
     {
-      "path": "images/Rules.png"
+      "path": "images/buildtask.png"
+    },
+    {
+      "path": "images/branches.png"
     },
     {
       "path": "images/limits.png"
     },
     {
-      "path": "images/branches.png"
+      "path": "images/Rules.png"
     }
   ],
   "content": {
@@ -49,25 +52,22 @@
       "uri": "http://devbraino.com"
     },
     "repository": {
-      "uri": "https://github.com/kerwinc/VSTSTasks"
+      "uri": "https://github.com/kerwinc/VSTSTasks/Tasks/GitflowBranchGate"
     },
     "issues": {
       "uri": "https://github.com/kerwinc/VSTSTasks/issues"
     }
   },
   "branding": {
-    "color": "rgb(36, 43, 50)",
-    "theme": "dark"
+    "color": "#8E44AD",
+    "theme": "light"
   },
   "icons": {
     "default": "images/extension-icon.png"
   },
   "files": [
     {
-      "path": "Tasks/GitflowBranchGate"
-    },
-    {
-      "path": "Tasks/SSDT.GenerateDeployReport"
+      "path": "Task"
     }
   ],
   "contributions": [
@@ -78,17 +78,7 @@
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "Tasks/GitflowBranchGate"
-      }
-    },
-    {
-      "id": "ssdt-dacpac-branchcompare-task",
-      "type": "ms.vss-distributed-task.task",
-      "targets": [
-        "ms.vss-distributed-task.tasks"
-      ],
-      "properties": {
-        "name": "Tasks/SSDT.GenerateDeployReport"
+        "name": "Task"
       }
     }
   ]

@@ -103,8 +103,10 @@ Write-OutputWarnings -Branches $Branches
 
 $summaryTitle = "Gitflow Branch Gate Report"
 $summaryFilePath = "$stagingDirectory\GitflowBranchGate.ReportSummary.md"
+$reportFilePath = "$scriptLocation\Report.html"
 Invoke-ReportSummary -Branches $branches -TemplatePath "$scriptLocation\ReportSummary.md" -ReportDestination $summaryFilePath
 Write-Host "##vso[task.addattachment type=Distributedtask.Core.Summary;name=$summaryTitle;]$summaryFilePath"
+Write-Host "##vso[artifact.upload containerfolder=Reports;artifactname=GitflowGateReports;]$reportFilePath"
 
 Write-OutputErrors -Branches $Branches
 
