@@ -12,7 +12,7 @@ Your using the Gitflow branching model, or variation of it, Pull Requests with T
 
 <img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/Tasks/GitflowBranchGate/images/report-summary.png" alt="Branch Limits"/>
 
-[![Donate](./images/donate.png)](https://www.paypal.me/kerwincarpede)
+[![Donate](https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/Tasks/GitflowBranchGate/images/donate.png)](https://www.paypal.me/kerwincarpede)
 
 ### Features
 - Configure branch naming standards and make sure they are followed
@@ -21,13 +21,13 @@ Your using the Gitflow branching model, or variation of it, Pull Requests with T
 - Make sure all branches are never behind master
 - Make sure all feature branches are never behind develop
 - Prevent release & hotfix branches being created at the same time
-- Track active Pull Requests so prevent deployed changes from being rolled back
+- Track active Pull Requests from important branches to prevent deployed changes from being rolled back
 
 ### Branch Limits
 
 Apply branch limits for hotfixes, releases and feature branches:
 
-<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/Tasks/GitflowBranchGate/images/Limits.png" alt="Branch Limits" style="width: 540px;"/>
+<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/Tasks/GitflowBranchGate/images/Limits.png" alt="Branch Limits" style=""/>
 
 ### Branch Rules
 
