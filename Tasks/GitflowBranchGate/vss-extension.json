@@ -2,15 +2,14 @@
   "manifestVersion": 1,
   "id": "GitflowBranchGate",
   "name": "Gitflow Branch Gate",
-  "version": "0.2.53",
+  "version": "0.2.56",
   "publisher": "kerwincarpede",
   "galleryFlags": [
-    "Public",
-    "Preview"
+    "Public"
   ],
   "scopes": [
     "vso.work",
-    "vso.code_write",
+    "vso.code",
     "vso.build_execute"
   ],
   "demands": [
