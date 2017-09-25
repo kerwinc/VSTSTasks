@@ -337,7 +337,8 @@ Function Invoke-ReportSummary {
   param(
     [Parameter(Mandatory = $true)][System.Object[]]$Branches,
     [Parameter(Mandatory = $true)][string]$TemplatePath,
-    [Parameter(Mandatory = $true)][string]$ReportDestination
+    [Parameter(Mandatory = $true)][string]$ReportDestination,
+    [Parameter(Mandatory = $true)][bool]$DisplayIssues
   )
   Process {
     [System.Object[]]$errors = $Branches | Out-Errors -Type Error
@@ -355,19 +356,25 @@ Function Invoke-ReportSummary {
     $summaryContent = $summaryContent.Replace("@@MinStaleDays@@", $staleDaysMeasure.Minimum)
     $summaryContent = $summaryContent.Replace("@@AvgStaleDays@@", $staleDaysMeasure.Average)
     
+    $issues = "Not issues found"
+    $gateResult = "<span style='color:#fff;Background-Color:#00c700;padding:5px 5px;'>Passed</span>"
     if ($errors.Count -gt 0) {
-      $summaryContent = $summaryContent.Replace("@@GateResult@@", "<span style='color:#fff;Background-Color:#e80303;padding:5px 8px;'>Failed</span>")
-      $issuesUl = "### Issues:`n"
-      foreach($branchError in $errors){
-        $issuesUl += "- $($branchError.Message)`n"
+      $gateResult = "<span style='color:#fff;Background-Color:#e80303;padding:5px 8px;'>Failed</span>"
+
+      if ($DisplayIssues -eq $true) {
+        $issues = "### Issues:`n"
+        foreach($branchError in $errors){
+          $issues += "- $($branchError.Message)`n"
+        }  
       }
-      $summaryContent = $summaryContent.Replace("@@Issues@@", $issuesUl)
+      else {
+        $issues = ""
+      }
     }
-    else {
-      $summaryContent = $summaryContent.Replace("@@GateResult@@", "<span style='color:#fff;Background-Color:#00c700;padding:5px 5px;'>Passed</span>")
-      $summaryContent = $summaryContent.Replace("@@Issues@@", "Not issues found")
-    }
-    
+
+    $summaryContent = $summaryContent.Replace("@@GateResult@@", $gateResult)
+    $summaryContent = $summaryContent.Replace("@@Issues@@", $issues)
+
     Set-Content -Path $ReportDestination -Value $summaryContent
   }
 }

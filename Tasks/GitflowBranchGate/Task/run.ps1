@@ -12,13 +12,7 @@ $currentBranch = ($env:BUILD_SOURCEBRANCH).Replace("refs/heads/", "")
 $env:TEAM_AuthType = Get-VstsInput -Name "authenticationType" -Require
 $env:TEAM_PAT = $env:SYSTEM_ACCESSTOKEN
 $stagingDirectory = $env:BUILD_STAGINGDIRECTORY
-
-# $projectCollectionUri = "http://devtfs02/DefaultCollection"
-# $projectName = "RnD"
-# $repository = "RnD"
-# $currentBranch = "develop"
-# $env:TEAM_AUTHTYPE = "Basic"
-# $env:TEAM_PAT = "OjVidjN6Mm1wM2ViYnB0ZnNuYmpxaWV2ajNidDJwcW9hM2xudTZmZnRkaXA2anNhem14NHE="
+$showIssuesOnBuildSummary = [System.Convert]::ToBoolean((Get-VstsInput -Name "showIssuesOnBuildSummary" -Require))
 
 $rules = New-Object psobject -Property @{
   MasterBranch                                 = Get-VstsInput -Name "masterBranch" -Require
@@ -46,39 +40,12 @@ $rules = New-Object psobject -Property @{
   ReleaseBranchesMustNotHaveActivePullRequests = [System.Convert]::ToBoolean((Get-VstsInput -Name "releaseBranchesMustNotHavePendingPullRequests" -Require))
   BranchNamesMustMatchConventions              = [System.Convert]::ToBoolean((Get-VstsInput -Name "branchNamesMustMatchConventions" -Require))
 }
-# $rules = New-Object psobject -Property @{
-#   MasterBranch = "master"
-#   DevelopBranch = "develop"
-#   HotfixPrefix = "hotfix/*"
-#   ReleasePrefix = "release/*"
-#   FeaturePrefix = "feature/*"
-
-#   HotfixBranchLimit = 1
-#   HotfixDaysLimit = 10
-#   ReleaseBranchLimit = 1
-#   ReleaseDaysLimit = 10
-#   FeatureBranchLimit = 50
-#   FeatureDaysLimit = 45
-
-#   HotfixeBranchesMustNotBeBehindMaster = $false
-#   ReleaseBranchesMustNotBeBehindMaster = $false
-#   DevelopMustNotBeBehindMaster = $false
-#   FeatureBranchesMustNotBeBehindMaster = $false
-#   FeatureBranchesMustNotBeBehindDevelop = $false
-#   CurrentFeatureMustNotBeBehindDevelop = $false
-#   MustNotHaveHotfixAndReleaseBranches = $false
-#   MasterMustNotHaveActivePullRequests = $false
-#   HotfixBranchesMustNotHaveActivePullRequests = $false
-#   ReleaseBranchesMustNotHaveActivePullRequests = $false
-#   BranchNamesMustMatchConventions = $false
-# }
 
 Write-Output "Project Collection: [$projectCollectionUri]"
 Write-Output "Project Name: [$projectName]"
 Write-Output "Build Definition Id: [$buildDefinitionId]"
 Write-Output "Repository: [$repository]"
 Write-Output "Current Branch: [$currentBranch]"
-Write-Output "Master Branch: [$($Rules.MasterBranch)]"
 Write-Output "Authentication Type: [$env:TEAM_AUTHTYPE]"
 Write-Output "Rules:"
 $rules
@@ -88,6 +55,18 @@ $scriptLocation = (Get-Item -LiteralPath (Split-Path -Parent $MyInvocation.MyCom
 #Import Required Modules
 Import-Module "$scriptLocation\ps_modules\Custom\team.Extentions.psm1" -Force
 Import-Module "$scriptLocation\ps_modules\Custom\BranchRules.psm1" -Force
+
+#Check if the master branches exists
+$refs = Get-Branches -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository
+$master = $refs | Where-Object { $_.name -eq "refs/heads/$($Rules.MasterBranch)" }
+if ($master -eq $null) {
+  Write-Error "Could not find remote branch: refs/heads/$($Rules.MasterBranch)"
+}
+
+$develop = $refs | Where-Object { $_.name -eq "refs/heads/$($Rules.DevelopBranch)" }
+if ($develop -eq $null) {
+  Write-Error "Could not find remote branch: refs/heads/$($Rules.DevelopBranch)"
+}
 
 #Get All Branches
 [System.Object[]]$pullRequests = Get-PullRequests -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository -StatusFilter Active | ConvertTo-PullRequests
@@ -103,10 +82,11 @@ Write-OutputWarnings -Branches $Branches
 
 $summaryTitle = "Gitflow Branch Gate Report"
 $summaryFilePath = "$stagingDirectory\GitflowBranchGate.ReportSummary.md"
-$reportFilePath = "$scriptLocation\Report.html"
-Invoke-ReportSummary -Branches $branches -TemplatePath "$scriptLocation\ReportSummary.md" -ReportDestination $summaryFilePath
+Invoke-ReportSummary -Branches $branches -TemplatePath "$scriptLocation\ReportSummary.md" -ReportDestination $summaryFilePath -DisplayIssues $showIssuesOnBuildSummary
 Write-Host "##vso[task.addattachment type=Distributedtask.Core.Summary;name=$summaryTitle;]$summaryFilePath"
-Write-Host "##vso[artifact.upload containerfolder=Reports;artifactname=GitflowGateReports;]$reportFilePath"
+
+# $reportFilePath = "$scriptLocation\Report.html"
+# Write-Host "##vso[artifact.upload containerfolder=Reports;artifactname=GitflowGateReports;]$reportFilePath"
 
 Write-OutputErrors -Branches $Branches
 

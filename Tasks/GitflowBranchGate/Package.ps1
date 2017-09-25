@@ -3,20 +3,23 @@
 #npm install -g tfx-cli
 $ErrorActionPreference = "Stop"
 
-$taskJson = Get-Content -Path "Task\task.json" -raw | ConvertFrom-JsonNewtonsoft
-Write-Host "Updating Task: $($taskJson.name)" -ForegroundColor Yellow
-Write-Host "Current Version: $($taskJson.version.Major).$($taskJson.version.Minor).$($taskJson.version.Patch)"
-$taskJson.version.Patch = "$([System.Convert]::ToInt32($taskJson.version.Patch) + 1)"
+$task = Get-Content -Path ".\Task\task.json" -raw | ConvertFrom-JsonNewtonsoft
+$currentVersion = "$($task.version.Major).$($task.version.Minor).$($task.version.Patch)"
+$task.version.Patch = "$([System.Convert]::ToInt32($task.version.Patch) + 1)"
+[string]$newVersionNumber = "$($task.version.Major).$($task.version.Minor).$($task.version.Patch)"
+$task | ConvertTo-JsonNewtonsoft | set-content ".\Task\task.json"
 
-[string]$newVersionNumber = "$($taskJson.version.Major).$($taskJson.version.Minor).$($taskJson.version.Patch)"
+Write-Host "Updating Task: $($task.name)" -ForegroundColor Yellow
+Write-Host "Current Version: $currentVersion"
 Write-Host "New Version: $newVersionNumber"
-$taskJson | ConvertTo-JsonNewtonsoft | set-content ".\Task\task.json"
 
 $extensionJson = Get-Content -Path "vss-extension.json" -raw | ConvertFrom-JsonNewtonsoft
-Write-Host "Updating VSS-Extension: $($extensionJson.name)" -ForegroundColor Yellow
-Write-Host "Current Version: $($taskJson.version)"
-Write-Host "New Version: $newVersionNumber"
+$currentExtensionVersion = $extensionJson.version
 $extensionJson.version = "$newVersionNumber"
 $extensionJson | ConvertTo-JsonNewtonsoft | set-content "vss-extension.json"
+
+Write-Host "Updated VSS-Extension: $($extensionJson.name)" -ForegroundColor Yellow
+Write-Host "Current Version: $($currentExtensionVersion)"
+Write-Host "New Version: $newVersionNumber"
 
 tfx extension create --manifest vss-extension.json --output-path .\build\

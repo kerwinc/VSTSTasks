@@ -2,9 +2,12 @@
   "manifestVersion": 1,
   "id": "GitflowBranchGate",
   "name": "Gitflow Branch Gate",
-  "version": "0.2.22",
+  "version": "0.2.39",
   "publisher": "kerwincarpede",
-  "public": false,
+  "galleryFlags": [
+    "Public",
+    "Preview"
+  ],
   "repository": {
     "type": "git",
     "uri": "https://github.com/kerwinc/VSTSTasks/Tasks/GitflowBranchGate"

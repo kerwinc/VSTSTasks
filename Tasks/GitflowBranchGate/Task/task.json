@@ -17,7 +17,7 @@
   "version": {
     "Major": "0",
     "Minor": "2",
-    "Patch": "22"
+    "Patch": "39"
   },
   "minimumAgentVersion": "1.91.0",
   "instanceNameFormat": "Gitflow Branch Gate",
@@ -58,7 +58,7 @@
       "label": "Master Branch",
       "defaultValue": "master",
       "required": true,
-      "helpMarkDown": "Specify the master branch",
+      "helpMarkDown": "Specify the master branch. A valid branch must be provided.",
       "groupName": "branches"
     },
     {
@@ -67,7 +67,7 @@
       "label": "Develop Branch",
       "defaultValue": "develop",
       "required": true,
-      "helpMarkDown": "Specify the develop branch",
+      "helpMarkDown": "Specify the develop branch. A valid branch must be provided.",
       "groupName": "branches"
     },
     {
@@ -76,7 +76,7 @@
       "label": "Hotfix Branches",
       "defaultValue": "hotfix/*",
       "required": true,
-      "helpMarkDown": "Specify the pattern for hotfix branches",
+      "helpMarkDown": "Specify the prefix or pattern for hotfix branches",
       "groupName": "branches"
     },
     {
@@ -85,7 +85,7 @@
       "label": "Release Branches",
       "defaultValue": "release/*",
       "required": true,
-      "helpMarkDown": "Specify the pattern for release branches",
+      "helpMarkDown": "Specify the prefix or pattern for release branches",
       "groupName": "branches"
     },
     {
@@ -94,7 +94,7 @@
       "label": "Feature Branches",
       "defaultValue": "feature/*",
       "required": true,
-      "helpMarkDown": "Specify the pattern for feature branches",
+      "helpMarkDown": "Specify the prefix or pattern for feature branches",
       "groupName": "branches"
     },
     {
@@ -103,7 +103,7 @@
       "label": "Hotfix branch limit (number of branches)",
       "defaultValue": "1",
       "required": true,
-      "helpMarkDown": "Limit the number of hotfix branches.",
+      "helpMarkDown": "Limit the number of hotfix branches that can exist any any given time.",
       "groupName": "limits"
     },
     {
@@ -121,7 +121,7 @@
       "label": "Release branch limit (number of branches)",
       "defaultValue": "1",
       "required": true,
-      "helpMarkDown": "Limit the number of release branches.",
+      "helpMarkDown": "Limit the number of release branches that can exist any any given time.",
       "groupName": "limits"
     },
     {
@@ -139,7 +139,7 @@
       "label": "Feature branch limit (number of branches)",
       "defaultValue": "50",
       "required": true,
-      "helpMarkDown": "Limit the number of feature branches.",
+      "helpMarkDown": "Limit the number of feature branches that can exist any any given time.",
       "groupName": "limits"
     },
     {
@@ -251,6 +251,15 @@
       "groupName": "rules"
     },
     {
+      "name": "showIssuesOnBuildSummary",
+      "type": "boolean",
+      "label": "Show issues on build summary",
+      "defaultValue": "true",
+      "required": false,
+      "helpMarkDown": "Turning this on will show the list of issues on the build summary.",
+      "groupName": "advanced"
+    },
+    {
       "name": "authenticationType",
       "type": "pickList",
       "label": "Authentication",
@@ -260,7 +269,7 @@
         "OAuthToken": "OAuth Token",
         "WindowsAuthentication": "Windows Authentication"
       },
-      "helpMarkDown": "Specify the authentication type to use for communicating with API. Note: For OAuth Token, 'Allow scripts to access OAuth token' must be enabled in the build definition options. If 'Windows Authentication' is selected, this would be the account being used by the Build Agent.",
+      "helpMarkDown": "Specify the authentication type to use for communicating with the TFS API. Note: For OAuth Token, 'Allow scripts to access OAuth token' must be enabled in the build definition options. If 'Windows Authentication' is selected, this would be the account being used by the Build Agent.",
       "groupName": "advanced"
     }
   ],
