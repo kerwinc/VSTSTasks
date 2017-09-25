@@ -25,7 +25,7 @@ Your using the Gitflow branching model, or variation of it, Pull Requests with T
 
 The extension publishes a summary of the results to the build summary showing all issues:
 
-<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/Tasks/GitflowBranchGate/images/report-summary.png" alt="Report Summary"/>
+<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/Tasks/GitflowBranchGate/images/report-summary-2.png" alt="Report Summary"/>
 
 A detailed log is provided with all rules configured for that build, branches and active Pull Requests at that point in time.
 
