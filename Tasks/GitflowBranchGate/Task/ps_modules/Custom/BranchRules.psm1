@@ -121,8 +121,8 @@ Function Invoke-BranchRules {
     [string]$CurrentBranchName
   )
   Process {
-    $baseBranch = $Branches | Where-Object { $_.IsBaseVersion -eq "True" }
-
+    $baseBranch = $Branches | Where-Object { $_.BranchName -eq $Rules.MasterBranch }
+    
     foreach ($branch in $Branches) {
 
       if ($branch.BranchName -eq $Rules.MasterBranch) {
@@ -136,7 +136,7 @@ Function Invoke-BranchRules {
 
       if ($branch.BranchName -eq $Rules.DevelopBranch) {
         if ($Rules.DevelopMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
-          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Behind) commit(s) from $($baseBranch.BranchName)"
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"
         }
       }
 
@@ -153,7 +153,7 @@ Function Invoke-BranchRules {
         }
 
         if ($Rules.HotfixeBranchesMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
-          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Behind) commit(s) from $($baseBranch.BranchName)"
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"
         }
         if ($Rules.HotfixBranchesMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request."
@@ -323,7 +323,7 @@ Function Write-OutputErrors {
       Write-Output "------------------------------------------------------------------------------"
       Write-Output "Branches with Errors:"
       Write-Output "------------------------------------------------------------------------------"
-      $branches | Select-Object * -ExpandProperty Errors | Where-Object {$_.Type -eq "Error" } | Select-Object BranchName, Message | Sort-Object BranchName | Format-Table -Wrap
+      $Branches | Select-Object * -ExpandProperty Errors | Where-Object {$_.Type -eq "Error" } | Select-Object BranchName, Message | Sort-Object BranchName | Format-Table -Wrap
       Write-Error "Current branches did not pass the Gitflow Branch Gate rules."
     }
     else {

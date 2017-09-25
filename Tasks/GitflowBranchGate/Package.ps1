@@ -22,4 +22,6 @@ Write-Host "Updated VSS-Extension: $($extensionJson.name)" -ForegroundColor Yell
 Write-Host "Current Version: $($currentExtensionVersion)"
 Write-Host "New Version: $newVersionNumber"
 
+tfx build tasks upload --task-path .\Task
+
 tfx extension create --manifest vss-extension.json --output-path .\build\
