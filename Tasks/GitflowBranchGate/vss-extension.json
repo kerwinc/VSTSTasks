@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "GitflowBranchGate",
   "name": "Gitflow Branch Gate",
-  "version": "0.2.19",
+  "version": "0.2.21",
   "publisher": "kerwincarpede",
   "public": false,
   "repository": {
@@ -59,7 +59,7 @@
     }
   },
   "branding": {
-    "color": "rgb(126, 62, 152)",
+    "color": "#8e44ad",
     "theme": "dark"
   },
   "icons": {
