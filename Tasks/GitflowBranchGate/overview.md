@@ -40,3 +40,11 @@ Apply branch limits for hotfixes, releases and feature branches:
 Apply branch rules for all branches and active Pull Requests:
 
 <img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/Tasks/GitflowBranchGate/images/Rules.png" alt="Rules" style=""/>
+
+### Release Notes
+
+#### 0.2.54
+- Fixed a bug where multiple branch names were being printed for an issue
+
+#### 0.2.42
+- Initial Preview
