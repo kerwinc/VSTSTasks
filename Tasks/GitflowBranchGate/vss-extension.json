@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "GitflowBranchGate",
   "name": "Gitflow Branch Gate",
-  "version": "0.2.56",
+  "version": "0.2.57",
   "publisher": "kerwincarpede",
   "galleryFlags": [
     "Public"
@@ -17,7 +17,7 @@
   ],
   "repository": {
     "type": "git",
-    "uri": "https://github.com/kerwinc/VSTSTasks/Tasks/GitflowBranchGate"
+    "uri": "https://github.com/kerwinc/VSTSTasks/tree/master/Tasks/GitflowBranchGate"
   },
   "targets": [
     {
@@ -62,7 +62,7 @@
       "uri": "http://devbraino.com"
     },
     "repository": {
-      "uri": "https://github.com/kerwinc/VSTSTasks/Tasks/GitflowBranchGate"
+      "uri": "https://github.com/kerwinc/VSTSTasks/tree/master/Tasks/GitflowBranchGate"
     },
     "issues": {
       "uri": "https://github.com/kerwinc/VSTSTasks/issues"
