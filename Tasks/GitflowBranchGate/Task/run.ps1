@@ -6,13 +6,18 @@ Trace-VstsEnteringInvocation $MyInvocation
 
 $projectCollectionUri = $env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI
 $projectName = $env:SYSTEM_TEAMPROJECT
-$buildDefinitionId = $env:SYSTEM_DEFINITIONID
 $repository = Get-VstsInput -Name "repository" -Require
-$currentBranch = ($env:BUILD_SOURCEBRANCH).Replace("refs/heads/", "")
 $env:TEAM_AuthType = Get-VstsInput -Name "authenticationType" -Require
 $env:TEAM_PAT = $env:SYSTEM_ACCESSTOKEN
 $stagingDirectory = $env:BUILD_STAGINGDIRECTORY
 $showIssuesOnBuildSummary = [System.Convert]::ToBoolean((Get-VstsInput -Name "showIssuesOnBuildSummary" -Require))
+
+$build = New-Object psobject -Property @{
+  BuildId = $env:SYSTEM_DEFINITIONID
+  SourceBranch = ($env:BUILD_SOURCEBRANCH).Replace("refs/heads/", "")
+  BuildReason = $env:BUILD_REASON
+  RepositoryProvider = $env:BUILD_REPOSITORY_PROVIDER
+}
 
 $rules = New-Object psobject -Property @{
   MasterBranch                                 = Get-VstsInput -Name "masterBranch" -Require
@@ -43,9 +48,10 @@ $rules = New-Object psobject -Property @{
 
 Write-Output "Project Collection: [$projectCollectionUri]"
 Write-Output "Project Name: [$projectName]"
-Write-Output "Build Definition Id: [$buildDefinitionId]"
+Write-Output "Build Reason: [$($build.BuildId)]"
+Write-Output "Build Reason: [$($build.BuildReason)]"
 Write-Output "Repository: [$repository]"
-Write-Output "Current Branch: [$currentBranch]"
+Write-Output "Current Branch: [$($Build.SourceBranch)]"
 Write-Output "Authentication Type: [$env:TEAM_AUTHTYPE]"
 Write-Output "Rules:"
 $rules
@@ -74,7 +80,7 @@ if ($develop -eq $null) {
 [System.Object[]]$branches = Get-BranchStats -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository -BaseBranch $Rules.MasterBranch | ConvertTo-Branches
 $branches = Add-DevelopCompare -Branches $branches -BranchesComparedToDevelop $branchesComparedToDevelop
 $branches = Add-PullRequests -Branches $branches -PullRequests $pullRequests
-$branches = Invoke-BranchRules -Branches $branches -CurrentBranchName $currentBranch -Rules $rules
+$branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
 
 Write-OutputCurrentBranches -Branches $Branches
 Write-OutputPullRequests -PullRequests $pullRequests

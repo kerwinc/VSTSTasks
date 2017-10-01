@@ -117,8 +117,8 @@ Function Invoke-BranchRules {
   param(
     [Parameter(Mandatory = $true)]
     [System.Object]$Branches,
-    [System.Object]$Rules,
-    [string]$CurrentBranchName
+    [System.Object]$Build,
+    [System.Object]$Rules
   )
   Process {
     $baseBranch = $Branches | Where-Object { $_.BranchName -eq $Rules.MasterBranch }
@@ -126,10 +126,10 @@ Function Invoke-BranchRules {
     foreach ($branch in $Branches) {
 
       if ($branch.BranchName -eq $Rules.MasterBranch) {
-        if ($Rules.MasterMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0) {
+        if ($Rules.MasterMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0 -and $Build.BuildReason -ne "PullRequest") {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request."
         }
-        if ($Rules.MasterMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0) {
+        if ($Rules.MasterMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0 -and $Build.BuildReason -ne "PullRequest") {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch."
         }
       }
@@ -155,10 +155,10 @@ Function Invoke-BranchRules {
         if ($Rules.HotfixeBranchesMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"
         }
-        if ($Rules.HotfixBranchesMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0) {
+        if ($Rules.HotfixBranchesMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0 -and $Build.BuildReason -ne "PullRequest") {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request."
         }
-        if ($Rules.HotfixBranchesMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0) {
+        if ($Rules.HotfixBranchesMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0 -and $Build.BuildReason -ne "PullRequest") {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch."
         }
       }
@@ -178,10 +178,10 @@ Function Invoke-BranchRules {
         if ($Rules.ReleaseBranchesMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"
         }
-        if ($Rules.ReleaseBranchesMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0) {
+        if ($Rules.ReleaseBranchesMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0 -and $Build.BuildReason -ne "PullRequest") {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request."
         }
-        if ($Rules.ReleaseBranchesMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0) {
+        if ($Rules.ReleaseBranchesMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0 -and $Build.BuildReason -ne "PullRequest") {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch."
         }
       }
@@ -201,7 +201,7 @@ Function Invoke-BranchRules {
           if ($Rules.FeatureBranchesMustNotBeBehindDevelop -eq $true) {
             $type = "Error"
           }
-          if ($Rules.CurrentFeatureMustNotBeBehindDevelop -eq $true -and $branch.BranchName -eq $CurrentBranchName) {
+          if ($Rules.CurrentFeatureMustNotBeBehindDevelop -eq $true -and $branch.BranchName -eq $Build.SourceBranch) {
             $type = "Error"
           }
           $branch | Add-Error -Type $type -Message "$($branch.BranchName) is missing $($branch.Develop.Behind) commit(s) from develop"  
