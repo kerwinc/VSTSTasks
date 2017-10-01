@@ -12,6 +12,8 @@ Your using the Gitflow branching model, or variation of it, Pull Requests with T
 
 *Introducing the Gitflow Branch Gate build task...*
 
+Keeping branches up to date becomes difficult as the number of developers, requirements or product delivery increases. Many teams try to adopt a trunk based branching strategy, and while this potentially solves many problems, it's not always possible. This build task aims to promote short-lived branches and assist in moving all branches forward.
+
 ### Features
 - Configure branch naming standards and make sure they are followed
 - Apply branch limits to hotfixes, release and feature branches
@@ -43,7 +45,7 @@ Apply branch rules for all branches and active Pull Requests:
 
 ### Release Notes
 
-#### 0.2.62
+#### 0.2.64
 - Added an exclusion to the *Active Pull Request* rules if the current build's trigger was a Pull Request
 
 #### 0.2.54
