@@ -20,6 +20,7 @@ Function ConvertTo-Branches {
 
       $item | Add-Member -Type NoteProperty -Name "SourcePullRequests" -Value 0
       $item | Add-Member -Type NoteProperty -Name "TargetPullRequests" -Value 0
+      $item | Add-Member -Type NoteProperty -Name "PullRequests" -Value @()
 
       $item | Add-Member -Type NoteProperty -Name "Status" -Value "Valid"
       $item | Add-Member -Type NoteProperty -Name "SeverityThreshold" -Value "Info"
@@ -104,6 +105,12 @@ Function Add-PullRequests {
   Process {
     if ($PullRequests -and $PullRequests.Count -gt 0 ) {
       foreach ($branch in $Branches) {
+
+        [object[]]$branchPullRequests = $PullRequests | Where-Object {$_.SourceBranch -eq $branch.BranchName -or $_.TargetBranch -eq $branch.BranchName}
+        foreach($pullRequest in $branchPullRequests){
+          $branch.PullRequests += $pullRequest
+        }
+
         $branch.SourcePullRequests = @($PullRequests | Where-Object {$_.SourceBranch -eq $branch.BranchName }).Count
         $branch.TargetPullRequests = @($PullRequests | Where-Object {$_.TargetBranch -eq $branch.BranchName }).Count
       }
@@ -122,21 +129,29 @@ Function Invoke-BranchRules {
   )
   Process {
     $baseBranch = $Branches | Where-Object { $_.BranchName -eq $Rules.MasterBranch }
+    [bool]$isPullRequestBuild = $Build.BuildReason -eq "PullRequest"
     
     foreach ($branch in $Branches) {
-
+      
+      [bool]$isCurrentPullRequest = ($branch.PullRequests | Where-Object { $_.Id -eq $Build.PullRequestId }).Count -gt 0
+      
       if ($branch.BranchName -eq $Rules.MasterBranch) {
-        if ($Rules.MasterMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0 -and $Build.BuildReason -ne "PullRequest") {
+        if ($Rules.MasterMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0 -and $isPullRequestBuild -eq $true) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request."
         }
-        if ($Rules.MasterMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0 -and $Build.BuildReason -ne "PullRequest") {
+        if ($Rules.MasterMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0 -and $isPullRequestBuild -eq $true) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch."
         }
       }
 
       if ($branch.BranchName -eq $Rules.DevelopBranch) {
         if ($Rules.DevelopMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
-          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"
+          if ($isPullRequestBuild -ne $true -or $isCurrentPullRequest -ne $true) {
+            $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"  
+          }
+          else {
+            Write-Verbose "Rule Skipped: [DevelopMustNotBeBehindMaster]. Current build is was initiated from PR [$($Build.PullRequestId)]"
+          }
         }
       }
 

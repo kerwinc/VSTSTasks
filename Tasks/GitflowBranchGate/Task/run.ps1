@@ -16,6 +16,7 @@ $build = New-Object psobject -Property @{
   BuildId = $env:SYSTEM_DEFINITIONID
   SourceBranch = ($env:BUILD_SOURCEBRANCH).Replace("refs/heads/", "")
   BuildReason = $env:BUILD_REASON
+  PullRequestId = [System.Convert]::ToInt32($env:SYSTEM_PULLREQUEST_PULLREQUESTID)
   RepositoryProvider = $env:BUILD_REPOSITORY_PROVIDER
 }
 
