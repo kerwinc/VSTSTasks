@@ -45,6 +45,11 @@ Apply branch rules for all branches and active Pull Requests:
 
 ### Release Notes
 
+#### 0.2.68
+- Added exceptions to some rules to allow the build to pass if the current build was initiated from a Pull Request
+- Added the branch name to the stale branch error message
+- Improved the output summary in the build log
+
 #### 0.2.64
 - Added an exclusion to the *Active Pull Request* rules if the current build's trigger was a Pull Request
 

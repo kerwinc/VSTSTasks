@@ -107,7 +107,7 @@ Function Add-PullRequests {
       foreach ($branch in $Branches) {
 
         [object[]]$branchPullRequests = $PullRequests | Where-Object {$_.SourceBranch -eq $branch.BranchName -or $_.TargetBranch -eq $branch.BranchName}
-        foreach($pullRequest in $branchPullRequests){
+        foreach ($pullRequest in $branchPullRequests) {
           $branch.PullRequests += $pullRequest
         }
 
@@ -160,7 +160,7 @@ Function Invoke-BranchRules {
           $branch | Add-Error -Type Error -Message  "Hotfix branch limit reached"
         }
         if ($branch.StaleDays -gt $Rules.HotfixDaysLimit) {
-          $branch | Add-Error -Type Error -Message "Hotfix branch days limit reached (stale branch)"
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is stale and has reached hotfix days limit"
         }
 
         if ($Rules.MustNotHaveHotfixAndReleaseBranches -eq $true -and $($Branches | Where-Object {$_.BranchName -like $Rules.ReleasePrefix}).Count -gt 0) {
@@ -170,10 +170,10 @@ Function Invoke-BranchRules {
         if ($Rules.HotfixeBranchesMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"
         }
-        if ($Rules.HotfixBranchesMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0 -and $Build.BuildReason -ne "PullRequest") {
-          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request."
+        if ($Rules.HotfixBranchesMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0 -and ($isPullRequestBuild -eq $false -or $isCurrentPullRequest -eq $false)) {
+            $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request."
         }
-        if ($Rules.HotfixBranchesMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0 -and $Build.BuildReason -ne "PullRequest") {
+        if ($Rules.HotfixBranchesMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0 -and ($isPullRequestBuild -eq $false -or $isCurrentPullRequest -eq $false)) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch."
         }
       }
@@ -183,7 +183,7 @@ Function Invoke-BranchRules {
           $branch | Add-Error -Type Error -Message "Release branch limit reached"
         }
         if ($branch.StaleDays -gt $Rules.ReleaseDaysLimit) {
-          $branch | Add-Error -Type Error -Message "Release branch days limit reached (stale branch)"
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is stale and has reached release days limit"
         }
 
         if ($Rules.MustNotHaveHotfixAndReleaseBranches -eq $true -and $($Branches | Where-Object {$_.BranchName -like $Rules.HotfixPrefix}).Count -gt 0) {
@@ -193,10 +193,10 @@ Function Invoke-BranchRules {
         if ($Rules.ReleaseBranchesMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"
         }
-        if ($Rules.ReleaseBranchesMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0 -and $Build.BuildReason -ne "PullRequest") {
+        if ($Rules.ReleaseBranchesMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0 -and ($isPullRequestBuild -eq $false -or $isCurrentPullRequest -eq $false)) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request."
         }
-        if ($Rules.ReleaseBranchesMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0 -and $Build.BuildReason -ne "PullRequest") {
+        if ($Rules.ReleaseBranchesMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0 -and ($isPullRequestBuild -eq $false -or $isCurrentPullRequest -eq $false)) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch."
         }
       }
@@ -206,7 +206,7 @@ Function Invoke-BranchRules {
           $branch | Add-Error -Type Error -Message "Feature branch limit reached"
         }
         if ($branch.StaleDays -gt $Rules.FeatureDaysLimit) {
-          $branch | Add-Error -Type Error -Message "Feature branch days limit reached (stale branch)"
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is stale and has reached feature days limit"
         }
         if ($Rules.FeatureBranchesMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"
@@ -269,7 +269,7 @@ Function Write-OutputCurrentBranches {
     Write-Output "------------------------------------------------------------------------------"
     Write-Output "Current Branches:"
     Write-Output "------------------------------------------------------------------------------"
-    $Branches | Select-Object BranchName, Master, Develop, Modified, ModifiedBy, StaleDays | Format-Table
+    $Branches | Select-Object BranchName, @{Name='Master';Expression={ "$($_.Master.Behind) | $($_.Master.Ahead)" }}, @{Name='Develop';Expression={ "$($_.Develop.Behind) | $($_.Develop.Ahead)" }}, @{Name='Modified';Expression={Get-Date $_.Modified -Format 'dd-MMM-yyyy'}}, ModifiedBy, StaleDays, @{Name='Issues';Expression={$_.Errors.Count}} | Format-Table
   }
 }
 
@@ -282,8 +282,8 @@ Function Write-OutputPullRequests {
     Write-Output "------------------------------------------------------------------------------"
     Write-Output "Active Pull Requests:"
     Write-Output "------------------------------------------------------------------------------"
-    if($PullRequests -ne $null -and $PullRequests.Count -gt 0){
-      $PullRequests | Select-Object ID, CreatedBy, SourceBranch, TargetBranch, Created | Format-Table
+    if ($PullRequests -ne $null -and $PullRequests.Count -gt 0) {
+      $PullRequests | Select-Object ID, CreatedBy, SourceBranch, TargetBranch, @{Name='Created';Expression={Get-Date $_.Created -Format 'dd-MMM-yyyy'}} | Format-Table
     }
     else {
       Write-Output "There are no active Pull Requests at the moment..."
@@ -378,7 +378,7 @@ Function Invoke-ReportSummary {
 
       if ($DisplayIssues -eq $true) {
         $issues = "### Issues:`n"
-        foreach($branchError in $errors){
+        foreach ($branchError in $errors) {
           $issues += "- $($branchError.Message)`n"
         }  
       }

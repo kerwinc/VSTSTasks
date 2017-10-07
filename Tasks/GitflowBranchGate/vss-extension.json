@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "GitflowBranchGate",
   "name": "Gitflow Branch Gate",
-  "version": "0.2.65",
+  "version": "0.2.68",
   "publisher": "kerwincarpede",
   "galleryFlags": [
     "Public"
