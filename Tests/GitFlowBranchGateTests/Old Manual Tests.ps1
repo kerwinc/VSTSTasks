@@ -2,7 +2,7 @@
 param(
 )
 
-$projectCollectionUri = "http://devtfs02/DefaultCollection"
+$projectCollectionUri = "http://devtfs/DefaultCollection"
 $projectName = "RnD"
 $repository = "RnD"
 $currentBranch = "develop"
@@ -59,7 +59,7 @@ Write-Output "Authentication Type: [$env:TEAM_AUTHTYPE]"
 Write-Output "Rules:"
 $rules
 
-$scriptLocation = "C:\Dev\GitHub\VSTSTasks\Tasks\GitflowBranchGate\Task"
+$scriptLocation = "D:\Dev\GitHub\VSTSTasks\Tasks\GitflowBranchGate\Task"
 
 #Import Required Modules
 Import-Module "$scriptLocation\ps_modules\Custom\team.Extentions.psm1" -Force
@@ -74,7 +74,8 @@ if ($master -eq $null) {
 
 $develop = $refs | Where-Object { $_.name -eq "refs/heads/$($Rules.DevelopBranch)" }
 if ($develop -eq $null) {
-  Write-Error "Could not find remote branch: refs/heads/$($Rules.DevelopBranch)"
+  Write-Error "Could not find remote branch: refs/heads/$($Rules.DevelopBranch)"Y
+  
 }
 
 #Get All Branches
