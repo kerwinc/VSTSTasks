@@ -1,0 +1,61 @@
+{
+  "value": [
+    {
+      "repository": {
+        "id": "e37bec70-e77e-4a85-8625-442f946e7ea5",
+        "name": "Marketplace",
+        "url": "http://devtfs/DefaultCollection/_apis/git/repositories/e37bec70-e77e-4a85-8625-442f946e7ea5",
+        "project": {
+          "id": "bf65e8df-cf5a-4b6d-8f3e-7bb55c972e4c",
+          "name": "Marketplace",
+          "state": "unchanged",
+          "visibility": "unchanged"
+        }
+      },
+      "pullRequestId": 1,
+      "codeReviewId": 1,
+      "status": "active",
+      "createdBy": {
+        "displayName": "Kerwin Carpede",
+        "url": "http://devtfs/DefaultCollection/_apis/Identities/0f6bdb02-d472-440a-a148-b55c2965ccaa",
+        "id": "0f6bdb02-d472-440a-a148-b55c2965ccaa",
+        "uniqueName": "DEVIT\\kerwinc",
+        "imageUrl": "http://devtfs/DefaultCollection/_api/_common/identityImage?id=0f6bdb02-d472-440a-a148-b55c2965ccaa"
+      },
+      "creationDate": "2018-08-09T18:05:18.3805763Z",
+      "title": "developToMasterTest",
+      "description": "minor change",
+      "sourceRefName": "refs/heads/develop",
+      "targetRefName": "refs/heads/master",
+      "mergeStatus": "succeeded",
+      "mergeId": "36593849-1006-4450-b1f4-1926f4c81c7a",
+      "lastMergeSourceCommit": {
+        "commitId": "06e166aca23dedb49174b2ace3dddcdbdec4f05e",
+        "url": "http://devtfs/DefaultCollection/_apis/git/repositories/e37bec70-e77e-4a85-8625-442f946e7ea5/commits/06e166aca23dedb49174b2ace3dddcdbdec4f05e"
+      },
+      "lastMergeTargetCommit": {
+        "commitId": "0dedf5ff5ce3618ba24882b8cf38d21ef7d00f0e",
+        "url": "http://devtfs/DefaultCollection/_apis/git/repositories/e37bec70-e77e-4a85-8625-442f946e7ea5/commits/0dedf5ff5ce3618ba24882b8cf38d21ef7d00f0e"
+      },
+      "lastMergeCommit": {
+        "commitId": "1de62cdcc2419c401c85c9929749b24a2698cee0",
+        "url": "http://devtfs/DefaultCollection/_apis/git/repositories/e37bec70-e77e-4a85-8625-442f946e7ea5/commits/1de62cdcc2419c401c85c9929749b24a2698cee0"
+      },
+      "reviewers": [
+        {
+          "reviewerUrl": "http://devtfs/DefaultCollection/_apis/git/repositories/e37bec70-e77e-4a85-8625-442f946e7ea5/pullRequests/1/reviewers/20e01c3e-cb1f-4217-9515-1d9e3170283d",
+          "vote": 0,
+          "displayName": "[Marketplace]\\Marketplace Team",
+          "url": "http://devtfs/DefaultCollection/_apis/Identities/20e01c3e-cb1f-4217-9515-1d9e3170283d",
+          "id": "20e01c3e-cb1f-4217-9515-1d9e3170283d",
+          "uniqueName": "vstfs:///Classification/TeamProject/bf65e8df-cf5a-4b6d-8f3e-7bb55c972e4c\\Marketplace Team",
+          "imageUrl": "http://devtfs/DefaultCollection/_api/_common/identityImage?id=20e01c3e-cb1f-4217-9515-1d9e3170283d",
+          "isContainer": true
+        }
+      ],
+      "url": "http://devtfs/DefaultCollection/_apis/git/repositories/e37bec70-e77e-4a85-8625-442f946e7ea5/pullRequests/1",
+      "supportsIterations": true
+    }
+  ],
+  "count": 1
+}

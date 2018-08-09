@@ -39,21 +39,22 @@ Function ConvertTo-PullRequests {
   )
   Process {
     $result = @()
-    foreach ($pullRequest in $PullRequests) {
-      $item = New-Object System.Object
-      $item | Add-Member -Type NoteProperty -Name "ID" -Value $pullRequest.pullRequestId
-      $item | Add-Member -Type NoteProperty -Name "Title" -Value $pullRequest.title
-      $item | Add-Member -Type NoteProperty -Name "SourceBranch" -Value $($pullRequest.sourceRefName.Replace("refs/heads/", ""))
-      $item | Add-Member -Type NoteProperty -Name "TargetBranch" -Value $($pullRequest.targetRefName.Replace("refs/heads/", ""))
-      $item | Add-Member -Type NoteProperty -Name "Created" -Value $pullRequest.creationDate
-      $item | Add-Member -Type NoteProperty -Name "CreatedBy" -Value $pullRequest.createdBy.displayName
-
-      $item | Add-Member -Type NoteProperty -Name "Status" -Value $pullRequest.status
-      $item | Add-Member -Type NoteProperty -Name "SeverityThreshold" -Value "Info"
-      $item | Add-Member -Type NoteProperty -Name "Errors" -Value $null
-      $result += $item
+    if ($PullRequests.Count -gt 0) {
+      foreach ($pullRequest in $PullRequests) {
+        $item = New-Object System.Object
+        $item | Add-Member -Type NoteProperty -Name "ID" -Value $pullRequest.pullRequestId
+        $item | Add-Member -Type NoteProperty -Name "Title" -Value $pullRequest.title
+        $item | Add-Member -Type NoteProperty -Name "SourceBranch" -Value $($pullRequest.sourceRefName.Replace("refs/heads/", ""))
+        $item | Add-Member -Type NoteProperty -Name "TargetBranch" -Value $($pullRequest.targetRefName.Replace("refs/heads/", ""))
+        $item | Add-Member -Type NoteProperty -Name "Created" -Value $pullRequest.creationDate
+        $item | Add-Member -Type NoteProperty -Name "CreatedBy" -Value $pullRequest.createdBy.displayName
+        $item | Add-Member -Type NoteProperty -Name "Status" -Value $pullRequest.status
+        $item | Add-Member -Type NoteProperty -Name "SeverityThreshold" -Value "Info"
+        $item | Add-Member -Type NoteProperty -Name "Errors" -Value $null
+        $result += $item
+      }
     }
-    return $result
+    return $result 
   }
 }
 
@@ -171,7 +172,7 @@ Function Invoke-BranchRules {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"
         }
         if ($Rules.HotfixBranchesMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0 -and ($isPullRequestBuild -eq $false -or $isCurrentPullRequest -eq $false)) {
-            $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request."
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request."
         }
         if ($Rules.HotfixBranchesMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0 -and ($isPullRequestBuild -eq $false -or $isCurrentPullRequest -eq $false)) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch."
@@ -269,7 +270,7 @@ Function Write-OutputCurrentBranches {
     Write-Output "------------------------------------------------------------------------------"
     Write-Output "Current Branches:"
     Write-Output "------------------------------------------------------------------------------"
-    $Branches | Select-Object BranchName, @{Name='Master';Expression={ "$($_.Master.Behind) | $($_.Master.Ahead)" }}, @{Name='Develop';Expression={ "$($_.Develop.Behind) | $($_.Develop.Ahead)" }}, @{Name='Modified';Expression={Get-Date $_.Modified -Format 'dd-MMM-yyyy'}}, ModifiedBy, StaleDays, @{Name='Issues';Expression={$_.Errors.Count}} | Format-Table
+    $Branches | Select-Object BranchName, @{Name = 'Master'; Expression = { "$($_.Master.Behind) | $($_.Master.Ahead)" }}, @{Name = 'Develop'; Expression = { "$($_.Develop.Behind) | $($_.Develop.Ahead)" }}, @{Name = 'Modified'; Expression = {Get-Date $_.Modified -Format 'dd-MMM-yyyy'}}, ModifiedBy, StaleDays, @{Name = 'Issues'; Expression = {$_.Errors.Count}} | Format-Table
   }
 }
 
@@ -283,7 +284,7 @@ Function Write-OutputPullRequests {
     Write-Output "Active Pull Requests:"
     Write-Output "------------------------------------------------------------------------------"
     if ($PullRequests -ne $null -and $PullRequests.Count -gt 0) {
-      $PullRequests | Select-Object ID, CreatedBy, SourceBranch, TargetBranch, @{Name='Created';Expression={Get-Date $_.Created -Format 'dd-MMM-yyyy'}} | Format-Table
+      $PullRequests | Select-Object ID, CreatedBy, SourceBranch, TargetBranch, @{Name = 'Created'; Expression = {Get-Date $_.Created -Format 'dd-MMM-yyyy'}} | Format-Table
     }
     else {
       Write-Output "There are no active Pull Requests at the moment..."

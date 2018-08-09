@@ -1,0 +1,29 @@
+{
+  "value": [
+    {
+      "name": "refs/heads/develop",
+      "objectId": "0dedf5ff5ce3618ba24882b8cf38d21ef7d00f0e",
+      "creator": {
+        "displayName": "Kerwin Carpede",
+        "url": "http://devtfs/DefaultCollection/_apis/Identities/0f6bdb02-d472-440a-a148-b55c2965ccaa",
+        "id": "0f6bdb02-d472-440a-a148-b55c2965ccaa",
+        "uniqueName": "DEVIT\\kerwinc",
+        "imageUrl": "http://devtfs/DefaultCollection/_api/_common/identityImage?id=0f6bdb02-d472-440a-a148-b55c2965ccaa"
+      },
+      "url": "http://devtfs/DefaultCollection/_apis/git/repositories/e37bec70-e77e-4a85-8625-442f946e7ea5/refs?filter=heads%2Fdevelop"
+    },
+    {
+      "name": "refs/heads/master",
+      "objectId": "0dedf5ff5ce3618ba24882b8cf38d21ef7d00f0e",
+      "creator": {
+        "displayName": "Kerwin Carpede",
+        "url": "http://devtfs/DefaultCollection/_apis/Identities/0f6bdb02-d472-440a-a148-b55c2965ccaa",
+        "id": "0f6bdb02-d472-440a-a148-b55c2965ccaa",
+        "uniqueName": "DEVIT\\kerwinc",
+        "imageUrl": "http://devtfs/DefaultCollection/_api/_common/identityImage?id=0f6bdb02-d472-440a-a148-b55c2965ccaa"
+      },
+      "url": "http://devtfs/DefaultCollection/_apis/git/repositories/e37bec70-e77e-4a85-8625-442f946e7ea5/refs?filter=heads%2Fmaster"
+    }
+  ],
+  "count": 2
+}

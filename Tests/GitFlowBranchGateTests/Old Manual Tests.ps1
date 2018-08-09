@@ -3,50 +3,52 @@ param(
 )
 
 $projectCollectionUri = "http://devtfs/DefaultCollection"
-$projectName = "RnD"
-$repository = "RnD"
+$projectName = "Marketplace"
+$repository = "Marketplace"
 $currentBranch = "develop"
-$env:TEAM_AUTHTYPE = "Basic"
-$env:TEAM_PAT = "OjVidjN6Mm1wM2ViYnB0ZnNuYmpxaWV2ajNidDJwcW9hM2xudTZmZnRkaXA2anNhem14NHE="
+# $env:TEAM_AUTHTYPE = "pat"
+# $env:TEAM_PAT = "6ec7zcyb6i2fbzas3o57uqtlctydduba2xpatb5sj4rm2furrdiq"
+$env:TEAM_AUTHTYPE = "Basic" 
+$env:TEAM_PAT = "ZGV2aXRca2Vyd2luYzp3aW5rZXIxMA=="
 $stagingDirectory = "c:\temp\GitflowBranchGate"
 $showIssuesOnBuildSummary = $false
 
 $build = New-Object psobject -Property @{
-  BuildId = 0
-  SourceBranch = "develop"
-  BuildReason = "PullRequest"
-  PullRequestId = 7
+  BuildId            = 0
+  SourceBranch       = "develop"
+  BuildReason        = "PullRequest"
+  PullRequestId      = 7
   RepositoryProvider = "Git"
 }
 
 $rules = New-Object psobject -Property @{
-  MasterBranch = "master"
-  DevelopBranch = "develop"
-  HotfixPrefix = "hotfix/*"
-  ReleasePrefix = "release/*"
-  FeaturePrefix = "feature/*"
+  MasterBranch                                 = "master"
+  DevelopBranch                                = "develop"
+  HotfixPrefix                                 = "hotfix/*"
+  ReleasePrefix                                = "release/*"
+  FeaturePrefix                                = "feature/*"
 
-  HotfixBranchLimit = 1
-  HotfixDaysLimit = 10
-  ReleaseBranchLimit = 1
-  ReleaseDaysLimit = 10
-  FeatureBranchLimit = 50
-  FeatureDaysLimit = 45
+  HotfixBranchLimit                            = 1
+  HotfixDaysLimit                              = 10
+  ReleaseBranchLimit                           = 1
+  ReleaseDaysLimit                             = 10
+  FeatureBranchLimit                           = 50
+  FeatureDaysLimit                             = 45
 
-  HotfixeBranchesMustNotBeBehindMaster = $false
-  ReleaseBranchesMustNotBeBehindMaster = $false
-  DevelopMustNotBeBehindMaster = $true
-  FeatureBranchesMustNotBeBehindMaster = $false
-  FeatureBranchesMustNotBeBehindDevelop = $false
-  CurrentFeatureMustNotBeBehindDevelop = $false
-  MustNotHaveHotfixAndReleaseBranches = $false
+  HotfixeBranchesMustNotBeBehindMaster         = $false
+  ReleaseBranchesMustNotBeBehindMaster         = $false
+  DevelopMustNotBeBehindMaster                 = $true
+  FeatureBranchesMustNotBeBehindMaster         = $false
+  FeatureBranchesMustNotBeBehindDevelop        = $false
+  CurrentFeatureMustNotBeBehindDevelop         = $false
+  MustNotHaveHotfixAndReleaseBranches          = $false
 
-  MasterMustNotHaveIncomingPullRequests = $false
-  MasterMustNotHaveOutgoingPullRequests = $false
+  MasterMustNotHaveIncomingPullRequests        = $false
+  MasterMustNotHaveOutgoingPullRequests        = $false
 
-  HotfixBranchesMustNotHaveActivePullRequests = $false
+  HotfixBranchesMustNotHaveActivePullRequests  = $false
   ReleaseBranchesMustNotHaveActivePullRequests = $false
-  BranchNamesMustMatchConventions = $false
+  BranchNamesMustMatchConventions              = $false
 }
 
 Write-Output "Project Collection: [$projectCollectionUri]"
@@ -67,6 +69,7 @@ Import-Module "$scriptLocation\ps_modules\Custom\BranchRules.psm1" -Force
 
 #Check if the master branches exists
 $refs = Get-Branches -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository
+
 $master = $refs | Where-Object { $_.name -eq "refs/heads/$($Rules.MasterBranch)" }
 if ($master -eq $null) {
   Write-Error "Could not find remote branch: refs/heads/$($Rules.MasterBranch)"
@@ -75,7 +78,6 @@ if ($master -eq $null) {
 $develop = $refs | Where-Object { $_.name -eq "refs/heads/$($Rules.DevelopBranch)" }
 if ($develop -eq $null) {
   Write-Error "Could not find remote branch: refs/heads/$($Rules.DevelopBranch)"Y
-  
 }
 
 #Get All Branches
