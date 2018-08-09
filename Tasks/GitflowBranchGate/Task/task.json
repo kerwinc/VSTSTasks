@@ -16,8 +16,8 @@
   "demands": [],
   "version": {
     "Major": "0",
-    "Minor": "2",
-    "Patch": "68"
+    "Minor": "3",
+    "Patch": "5"
   },
   "minimumAgentVersion": "1.91.0",
   "instanceNameFormat": "Gitflow Branch Gate",
@@ -112,7 +112,7 @@
       "label": "Hotfix branches must not be older than (days)",
       "defaultValue": "10",
       "required": true,
-      "helpMarkDown": "",
+      "helpMarkDown": "Limit the number of days any hotfix branch can go without a commit i.e. go stale.",
       "groupName": "limits"
     },
     {
@@ -130,7 +130,7 @@
       "label": "Release branches must not be older than (days)",
       "defaultValue": "10",
       "required": true,
-      "helpMarkDown": "",
+      "helpMarkDown": "Limit the number of days any release branch can go without a commit i.e. go stale.",
       "groupName": "limits"
     },
     {
@@ -148,7 +148,7 @@
       "label": "Feature branches must not be older than (days)",
       "defaultValue": "45",
       "required": true,
-      "helpMarkDown": "Limit the number of feature branches.",
+      "helpMarkDown": "Limit the number of days any feature branch can go without a commit i.e. go stale.",
       "groupName": "limits"
     },
     {
@@ -203,6 +203,15 @@
       "defaultValue": "true",
       "required": false,
       "helpMarkDown": "Turning this on will fail the build if the current feature branch being built is behind the develop branch.",
+      "groupName": "rules"
+    },
+    {
+      "name": "CurrentFeatureMustNotBeBehindMaster",
+      "type": "boolean",
+      "label": "Current Feature branch must not be behind master",
+      "defaultValue": "true",
+      "required": false,
+      "helpMarkDown": "Turning this on will fail the build if the current feature branch being built is behind the master branch.",
       "groupName": "rules"
     },
     {

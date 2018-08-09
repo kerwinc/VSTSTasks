@@ -13,10 +13,10 @@ $stagingDirectory = $env:BUILD_STAGINGDIRECTORY
 $showIssuesOnBuildSummary = [System.Convert]::ToBoolean((Get-VstsInput -Name "showIssuesOnBuildSummary" -Require))
 
 $build = New-Object psobject -Property @{
-  BuildId = $env:SYSTEM_DEFINITIONID
-  SourceBranch = ($env:BUILD_SOURCEBRANCH).Replace("refs/heads/", "")
-  BuildReason = $env:BUILD_REASON
-  PullRequestId = [System.Convert]::ToInt32($env:SYSTEM_PULLREQUEST_PULLREQUESTID)
+  BuildId            = $env:SYSTEM_DEFINITIONID
+  SourceBranch       = ($env:BUILD_SOURCEBRANCH).Replace("refs/heads/", "")
+  BuildReason        = $env:BUILD_REASON
+  PullRequestId      = [System.Convert]::ToInt32($env:SYSTEM_PULLREQUEST_PULLREQUESTID)
   RepositoryProvider = $env:BUILD_REPOSITORY_PROVIDER
 }
 
@@ -40,6 +40,7 @@ $rules = New-Object psobject -Property @{
   FeatureBranchesMustNotBeBehindMaster         = [System.Convert]::ToBoolean((Get-VstsInput -Name "featureBranchesMustNotBeBehindMaster" -Require))
   FeatureBranchesMustNotBeBehindDevelop        = [System.Convert]::ToBoolean((Get-VstsInput -Name "featureBranchesMustNotBeBehindDevelop" -Require))
   CurrentFeatureMustNotBeBehindDevelop         = [System.Convert]::ToBoolean((Get-VstsInput -Name "CurrentFeatureMustNotBeBehindDevelop" -Require))
+  CurrentFeatureMustNotBeBehindMaster          = [System.Convert]::ToBoolean((Get-VstsInput -Name "CurrentFeatureMustNotBeBehindMaster" -Require))
   MustNotHaveHotfixAndReleaseBranches          = [System.Convert]::ToBoolean((Get-VstsInput -Name "mustNotHaveHotfixAndReleaseBranches" -Require))
   MasterMustNotHaveActivePullRequests          = [System.Convert]::ToBoolean((Get-VstsInput -Name "masterMustNotHavePendingPullRequests" -Require))
   HotfixBranchesMustNotHaveActivePullRequests  = [System.Convert]::ToBoolean((Get-VstsInput -Name "hotfixBranchesMustNotHavePendingPullRequests" -Require))

@@ -1,3 +1,13 @@
+#Pre-requisites
+
+### TFX-CLI for building and publishing TFS Extensions
+
+> npm install -g tfx-cli
+
+### Newtonsoft.json for PowerShell
+
+> Install-Module -Name newtonsoft.json
+
 # Testing Framework
 
 Unit testing framework used is, of course, Pester :).
