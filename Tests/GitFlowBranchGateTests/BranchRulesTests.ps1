@@ -285,7 +285,7 @@ Describe "BrandRules Module Tests" {
 
 }
 
-Describe "Default Rules with Invalid Branche Stats Tests" { 
+Describe "Invoke-BranchRules Tests" { 
   
   function _getConextBranches {
   
@@ -298,9 +298,9 @@ Describe "Default Rules with Invalid Branche Stats Tests" {
     return $branches
   }
 
-  Context "When default rules set and validing master" { 
+  Context "When Invoke-BranchRules is executed and validating master" {
 
-    It "should return 'has an active Pull Request' Error when master has an active PR" { 
+    It "should return 'has an active Pull Request' error when master has an active PR" { 
       # Arrange
       $rules = Get-DefaultRules
       $branches = _getConextBranches
@@ -315,6 +315,27 @@ Describe "Default Rules with Invalid Branche Stats Tests" {
       $branch = $branches | Where-Object {$_.BranchName -eq "master"}
 
       #Assert
+      $branch.TargetPullRequests | Should Be 1
+      $branch.SourcePullRequests | Should Be 0
+      $branch.Errors.Count | Should be 0
+    }
+
+    It "should return 'has an active Pull Request' error when master has an active PR and renamed master" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.MasterBranch = "AlternateMaster"
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -eq "master"} | Foreach {
+        $_.BranchName = "AlternateMaster"
+      }
+      $build = Get-DefaultPullRequestBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "AlternateMaster"}
+
+      #Assert
+      $branch.BranchName | Should Be "AlternateMaster"
       $branch.TargetPullRequests | Should Be 1
       $branch.SourcePullRequests | Should Be 0
       $branch.Errors.Count | Should be 0
@@ -357,10 +378,6 @@ Describe "Default Rules with Invalid Branche Stats Tests" {
       $branch.Errors | Where-Object {$_.Message -like "*has an active Pull Request."} | Should Not BeNullOrEmpty
     }
     
-  }
-  
-  Context "When custom rules set and validing master" { 
-
     It "should have 0 errors if master has an active PR and MasterMustNotHaveActivePullRequests is false" { 
       # Arrange
       $rules = Get-DefaultRules
@@ -377,7 +394,335 @@ Describe "Default Rules with Invalid Branche Stats Tests" {
       $rules.MasterBranch | Should Be "master"
       $branch.Errors | Should BeNullOrEmpty
     }
+
+  }
+
+  Context "When Invoke-BranchRules is executed and validating develop" { 
+
+    It "should return 'develop is missing 3 commit(s) from master' Error when develop is behind master with default rules" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "develop"}
+
+      #Assert
+      $branch.Errors.Count | Should be 1
+      $branch.Errors[0].Message | Should BeLike "*develop is missing 3 commit(s) from master"
+    }
+
+    It "should return 'AlternateDevelop is missing 3 commit(s) from master' Error when develop is behind master and renamed develop branch" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.DevelopBranch = "AlternateDevelop"
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -eq "develop"} | Foreach {
+        $_.BranchName = "AlternateDevelop"
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "AlternateDevelop"}
+
+      #Assert
+      $branch.BranchName | Should Be "AlternateDevelop"
+      $branch.Errors.Count | Should be 1
+      $branch.Errors[0].Message | Should BeLike "*develop is missing 3 commit(s) from master"
+    }
+
+    It "should return no errors when develop is NOT behind master and Rules.DevelopMustNotBeBehindMaster is true" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -eq "develop"} | Foreach {
+        $_.Master.Behind = 0
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "develop"}
+
+      #Assert
+      $branch.Errors.Count | Should be 0
+    }
+
+    It "should return no errors when develop is behind master and PR Build" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $build = Get-DefaultPullRequestBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "develop"}
+
+      #Assert
+      $branch.Errors.Count | Should be 0
+    }
+
+    It "should return no errors when develop is behind master and Rules.DevelopMustNotBeBehindMaster is false" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.DevelopMustNotBeBehindMaster = $false
+      $branches = _getConextBranches
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "develop"}
+
+      #Assert
+      $branch.Errors.Count | Should be 0
+    }
     
+  }
+  
+  Context "When Invoke-BranchRules is executed and validating hotfixes" { 
+
+    It "should return 'Hotfix branch limit reached' error when multiple hotfix branches and HotfixBranchLimit is 1" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -like "hotfix/*"} | Foreach {
+        $_.Master.Behind = 0
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $hotfixBranches = $branches | Where-Object {$_.BranchName -like "hotfix/*"}
+
+      #Assert
+      $hotfixBranches.Count | Should Be 2
+      foreach ($branch in $hotfixBranches) {
+        $branch.Errors | Where-Object {$_.Message -eq "Hotfix branch limit reached"} | Should Not BeNullOrEmpty
+        $branch.Errors[0].Message | Should BeLike "Hotfix branch limit reached"
+      }
+    }
+
+    It "should return 'is stale and has reached hotfix days limit' error when hotfix branche is stale" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -eq "hotfix/hotfix1"} | Foreach {
+        $_.StaleDays = 11
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "hotfix/hotfix1"}
+
+      #Assert
+      $branch.Errors | Where-Object {$_.Message -like "*is stale and has reached hotfix days limit"} | Should Not BeNullOrEmpty
+    }
+
+    It "should return 'Must not have hotfix and release branches at the same time' error when there are hotfix & release branches" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.MustNotHaveHotfixAndReleaseBranches = $true
+      $branches = _getConextBranches
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $hotfixBranches = $branches | Where-Object {$_.BranchName -like "hotfix/*"}
+
+      #Assert
+      $hotfixBranches.Count | Should Be 2
+      foreach ($branch in $hotfixBranches) {
+        $branch.Errors | Where-Object {$_.Message -eq "Must not have hotfix and release branches at the same time"} | Should Not BeNullOrEmpty
+      }
+    }
+
+    It "should NOT return 'Must not have hotfix and release branches at the same time' error when there are hotfix & release branches and MustNotHaveHotfixAndReleaseBranches is false" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.MustNotHaveHotfixAndReleaseBranches = $false
+      $branches = _getConextBranches
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $hotfixBranches = $branches | Where-Object {$_.BranchName -like "hotfix/*"}
+
+      #Assert
+      $hotfixBranches.Count | Should Be 2
+      foreach ($branch in $hotfixBranches) {
+        $branch.Errors | Where-Object {$_.Message -eq "Must not have hotfix and release branches at the same time"} | Should BeNullOrEmpty
+      }
+    }
+    
+    It "should return 'hotfix is missing 100 commit(s) from master' error when hotfix1 is behind master" {
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -eq "hotfix/hotfix1"} | Foreach {
+        $_.Master.Behind = 100
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "hotfix/hotfix1"}
+
+      #Assert
+      $branch.Errors | Where-Object {$_.Message -like "*hotfix1 is missing 100 commit(s) from master"} | Should Not BeNullOrEmpty
+    }
+
+    It "should NOT return 'hotfix is missing 100 commit(s) from master' error when hotfix1 is behind master and HotfixeBranchesMustNotBeBehindMaster is false" {
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.HotfixeBranchesMustNotBeBehindMaster = $false
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -eq "hotfix/hotfix1"} | Foreach {
+        $_.Master.Behind = 100
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "hotfix/hotfix1"}
+
+      #Assert
+      $branch.Errors | Where-Object {$_.Message -like "*hotfix1 is missing 100 commit(s) from master"} | Should BeNullOrEmpty
+    }
+
+    It "should return 'hotfix has an active Pull Request.' error when hotfix1 has an active PR" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -like "hotfix/*"} | Foreach {
+        $_.TargetPullRequests = 1
+        $_.SourcePullRequests = 0
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $hotfixBranches = $branches | Where-Object {$_.BranchName -like "hotfix/*"}
+
+      #Assert
+      $hotfixBranches.Count | Should Be 2
+      foreach ($branch in $hotfixBranches) {
+        $branch.TargetPullRequests | Should Be 1
+        $branch.SourcePullRequests | Should Be 0  
+        $branch.Errors | Where-Object {$_.Message -like "*has an active Pull Request."} | Should Not BeNullOrEmpty
+      }
+    }
+
+    It "should return NOT 'hotfix has an active Pull Request.' error when hotfix has an active PR and HotfixBranchesMustNotHaveActivePullRequests is false" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.HotfixBranchesMustNotHaveActivePullRequests = $false
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -like "hotfix/*"} | Foreach {
+        $_.TargetPullRequests = 1
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $hotfixBranches = $branches | Where-Object {$_.BranchName -like "hotfix/*"}
+
+      #Assert
+      $hotfixBranches.Count | Should Be 2
+      foreach ($branch in $hotfixBranches) {
+        $branch.TargetPullRequests | Should Be 1
+        $branch.Errors | Where-Object {$_.Message -like "*has an active Pull Request."} | Should BeNullOrEmpty
+      }
+    }
+
+    It "should NOT return 'hotfix has an active Pull Request.' error when hotfix has an no active PRs" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -like "hotfix/*"} | Foreach {
+        $_.TargetPullRequests = 0
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $hotfixBranches = $branches | Where-Object {$_.BranchName -like "hotfix/*"}
+
+      #Assert
+      $hotfixBranches.Count | Should Be 2
+      foreach ($branch in $hotfixBranches) {
+        $branch.TargetPullRequests | Should Be 0  
+        $branch.Errors | Where-Object {$_.Message -like "*has an active Pull Request."} | Should BeNullOrEmpty
+      }
+    }
+
+    It "should return 'hotfix has an active Pull Request targeting another branch.' error when hotfix has an active PR" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -like "hotfix/*"} | Foreach {
+        $_.SourcePullRequests = 1
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $hotfixBranches = $branches | Where-Object {$_.BranchName -like "hotfix/*"}
+
+      #Assert
+      $hotfixBranches.Count | Should Be 2
+      foreach ($branch in $hotfixBranches) {
+        $branch.SourcePullRequests | Should Be 1 
+        $branch.Errors | Where-Object {$_.Message -like "*has an active Pull Request targeting another branch."} | Should Not BeNullOrEmpty
+      }
+    }
+
+    It "should NOT return 'hotfix has an active Pull Request targeting another branch.' error when hotfix has an active PR and HotfixBranchesMustNotHaveActivePullRequests is false" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.HotfixeBranchesMustNotBeBehindMaster = $false
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -like "hotfix/*"} | Foreach {
+        $_.SourcePullRequests = 0
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $hotfixBranches = $branches | Where-Object {$_.BranchName -like "hotfix/*"}
+
+      #Assert
+      $hotfixBranches.Count | Should Be 2
+      foreach ($branch in $hotfixBranches) {
+        $branch.SourcePullRequests | Should Be 0
+        $branch.Errors | Where-Object {$_.Message -like "*has an active Pull Request targeting another branch."} | Should BeNullOrEmpty
+      }
+    }
+
+    It "should NOT return 'hotfix has an active Pull Request targeting another branch.' error when hotfix has NO active PRs" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -like "hotfix/*"} | Foreach {
+        $_.SourcePullRequests = 0
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $hotfixBranches = $branches | Where-Object {$_.BranchName -like "hotfix/*"}
+
+      #Assert
+      $hotfixBranches.Count | Should Be 2
+      foreach ($branch in $hotfixBranches) {
+        $branch.SourcePullRequests | Should Be 0
+        $branch.Errors | Where-Object {$_.Message -like "*has an active Pull Request targeting another branch."} | Should BeNullOrEmpty
+      }
+    }
+
   }
 
 }
