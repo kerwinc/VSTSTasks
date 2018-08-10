@@ -17,7 +17,7 @@
   "version": {
     "Major": "0",
     "Minor": "3",
-    "Patch": "15"
+    "Patch": "19"
   },
   "minimumAgentVersion": "1.91.0",
   "instanceNameFormat": "Gitflow Branch Gate",

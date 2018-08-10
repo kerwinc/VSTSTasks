@@ -6,26 +6,28 @@ Function ConvertTo-Branches {
   )
   Process {
     $result = @()
-    foreach ($branch in $Branches) {
-      $item = New-Object System.Object
-      $item | Add-Member -Type NoteProperty -Name "BranchName" -Value $branch.name
-      $item | Add-Member -Type NoteProperty -Name "Master" -Value $(New-Object psobject -Property @{Behind = $branch.behindCount; Ahead = $branch.aheadCount})
-      
-      $item | Add-Member -Type NoteProperty -Name "Develop" -Value @()
-      $item | Add-Member -Type NoteProperty -Name "StaleDays" -Value (New-TimeSpan -Start $branch.commit.author.date -End (Get-Date)).Days
-      $item | Add-Member -Type NoteProperty -Name "Modified" -Value (Get-Date $branch.commit.author.date)
-      $item | Add-Member -Type NoteProperty -Name "ModifiedBy" -Value $branch.commit.author.name
-      $item | Add-Member -Type NoteProperty -Name "ModifiedByEmail" -Value $branch.commit.author.email
-      $item | Add-Member -Type NoteProperty -Name "IsBaseVersion" -Value $branch.isBaseVersion
-
-      $item | Add-Member -Type NoteProperty -Name "SourcePullRequests" -Value 0
-      $item | Add-Member -Type NoteProperty -Name "TargetPullRequests" -Value 0
-      $item | Add-Member -Type NoteProperty -Name "PullRequests" -Value @()
-
-      $item | Add-Member -Type NoteProperty -Name "Status" -Value "Valid"
-      $item | Add-Member -Type NoteProperty -Name "SeverityThreshold" -Value "Info"
-      $item | Add-Member -Type NoteProperty -Name "Errors" -Value @()
-      $result += $item
+    if ($null -ne $Branches -and $Branches.Count -gt 0) {
+      foreach ($branch in $Branches.Value) {
+        $item = New-Object System.Object
+        $item | Add-Member -Type NoteProperty -Name "BranchName" -Value $branch.name
+        $item | Add-Member -Type NoteProperty -Name "Master" -Value $(New-Object psobject -Property @{Behind = $branch.behindCount; Ahead = $branch.aheadCount})
+        
+        $item | Add-Member -Type NoteProperty -Name "Develop" -Value @()
+        $item | Add-Member -Type NoteProperty -Name "StaleDays" -Value (New-TimeSpan -Start $branch.commit.author.date -End (Get-Date)).Days
+        $item | Add-Member -Type NoteProperty -Name "Modified" -Value (Get-Date $branch.commit.author.date)
+        $item | Add-Member -Type NoteProperty -Name "ModifiedBy" -Value $branch.commit.author.name
+        $item | Add-Member -Type NoteProperty -Name "ModifiedByEmail" -Value $branch.commit.author.email
+        $item | Add-Member -Type NoteProperty -Name "IsBaseVersion" -Value $branch.isBaseVersion
+  
+        $item | Add-Member -Type NoteProperty -Name "SourcePullRequests" -Value 0
+        $item | Add-Member -Type NoteProperty -Name "TargetPullRequests" -Value 0
+        $item | Add-Member -Type NoteProperty -Name "PullRequests" -Value @()
+  
+        $item | Add-Member -Type NoteProperty -Name "Status" -Value "Valid"
+        $item | Add-Member -Type NoteProperty -Name "SeverityThreshold" -Value "Info"
+        $item | Add-Member -Type NoteProperty -Name "Errors" -Value @()
+        $result += $item
+      }
     }
     return $result
   }

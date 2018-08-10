@@ -34,7 +34,7 @@ Function Get-Branches {
   Process {
     $url = "$ProjectCollectionUri/$ProjectName/_apis/git/repositories/$Repository/refs/heads?api-version=1.0"
     $result = Invoke-GetCommand -Url $Url
-    return $result.Value
+    return $result
   }
 }
 
@@ -53,7 +53,7 @@ Function Get-BranchStats {
   Process {
     $url = "$ProjectCollectionUri/$ProjectName/_apis/git/repositories/$Repository/stats/branches?baseVersion=$BaseBranch&api-version=1.0"
     $result = Invoke-GetCommand -Url $Url
-    return $result.Value
+    return $result
   }
 }
 
@@ -72,7 +72,7 @@ Function Get-BranchStats {
   Process {
     $url = "$ProjectCollectionUri/$ProjectName/_apis/git/repositories/$Repository/stats/branches?baseVersion=$BaseBranch&api-version=1.0"
     $result = Invoke-GetCommand -Url $Url
-    return $result.Value
+    return $result
   }
 }
 

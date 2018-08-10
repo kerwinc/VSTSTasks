@@ -66,19 +66,19 @@ Import-Module "$scriptLocation\ps_modules\Custom\BranchRules.psm1" -Force
 
 #Check if the master branches exists
 $refs = Get-Branches -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository
-$master = $refs | Where-Object { $_.name -eq "refs/heads/$($Rules.MasterBranch)" }
+$master = $refs.Value | Where-Object { $_.name -eq "refs/heads/$($Rules.MasterBranch)" }
 if ($master -eq $null) {
   Write-Error "Could not find remote branch: refs/heads/$($Rules.MasterBranch)"
 }
 
-$develop = $refs | Where-Object { $_.name -eq "refs/heads/$($Rules.DevelopBranch)" }
+$develop = $refs.Value | Where-Object { $_.name -eq "refs/heads/$($Rules.DevelopBranch)" }
 if ($develop -eq $null) {
   Write-Error "Could not find remote branch: refs/heads/$($Rules.DevelopBranch)"
 }
 
 #Get All Branches
 [System.Object[]]$pullRequests = Get-PullRequests -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository -StatusFilter Active | ConvertTo-PullRequests
-[System.Object[]]$branchesComparedToDevelop = Get-BranchStats -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository -BaseBranch $Rules.DevelopBranch
+[System.Object[]]$branchesComparedToDevelop = (Get-BranchStats -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository -BaseBranch $Rules.DevelopBranch).Value
 [System.Object[]]$branches = Get-BranchStats -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository -BaseBranch $Rules.MasterBranch | ConvertTo-Branches
 $branches = Add-DevelopCompare -Branches $branches -BranchesComparedToDevelop $branchesComparedToDevelop
 $branches = Add-PullRequests -Branches $branches -PullRequests $pullRequests

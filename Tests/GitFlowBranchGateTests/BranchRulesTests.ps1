@@ -36,12 +36,22 @@ function Get-DefaultRules {
   }
 }
 
-function Get-DefaulBuild { 
+function Get-DefaultManualBuild { 
   return New-Object psobject -Property @{
-    BuildId            = 0
-    SourceBranch       = "develop"
+    BuildId            = 1
+    SourceBranch       = "master"
+    BuildReason        = "Manual"
+    PullRequestId      = 0
+    RepositoryProvider = "Git"
+  }
+}
+
+function Get-DefaultPullRequestBuild { 
+  return New-Object psobject -Property @{
+    BuildId            = 2
+    SourceBranch       = "master"
     BuildReason        = "PullRequest"
-    PullRequestId      = 7
+    PullRequestId      = 1
     RepositoryProvider = "Git"
   }
 }
@@ -115,7 +125,7 @@ Describe "BrandRules Module Tests" {
 
   Context "When ConvertTo-Branches is passed 2 branches" {
 
-    $branchStats = ConvertTo-Branches -Branches $(Get-Content "$assetsPath\Branches.Stats.MasterAsBase.json" | Out-String | ConvertFrom-Json).Value
+    $branchStats = Get-Content "$assetsPath\Branches.Stats.MasterAsBase.json" | Out-String | ConvertFrom-Json | ConvertTo-Branches
 
     It "should have 8 items in the array" { 
       $branchStats.Count | Should be 8
@@ -158,28 +168,62 @@ Describe "BrandRules Module Tests" {
       $branch.ModifiedBy | Should be "Kerwin Carpede"
     }
 
-    It "should have the correct data for master" { 
+    It "should return 0 for Master.Behind when given valid master branch" { 
       $branch = $branchStats | Where-Object {$_.BranchName -eq "master"}
-
-      $branch.BranchName | Should be "master"
       $branch.Master.Behind | Should be 0
+    }
+
+    It "should return 0 for Master.Ahead when given valid master branch" { 
+      $branch = $branchStats | Where-Object {$_.BranchName -eq "master"}
       $branch.Master.Ahead | Should be 0
-      # $branch.StaleDays | Should be 0
-      $branch.IsBaseVersion | Should BeTrue
-      $branch.SourcePullRequests | Should be 0
-      $branch.TargetPullRequests | Should be 0
+    }
+
+    It "should return null for PullRequests when given valid master branch" { 
+      $branch = $branchStats | Where-Object {$_.BranchName -eq "master"}
       $branch.PullRequests | Should BeNullOrEmpty
+    }
+
+    It "should return true for IsBaseVersion when given valid master branch" { 
+      $branch = $branchStats | Where-Object {$_.BranchName -eq "master"}
+      $branch.IsBaseVersion | Should BeTrue
+    }
+
+    It "should return 0 for SourcePullRequests when given valid master branch" { 
+      $branch = $branchStats | Where-Object {$_.BranchName -eq "master"}
+      $branch.SourcePullRequests | Should be 0
+    }
+
+    It "should return 0 for TargetPullRequests when given valid master branch" { 
+      $branch = $branchStats | Where-Object {$_.BranchName -eq "master"}
+      $branch.TargetPullRequests | Should be 0
+    }
+
+    It "should return 0 for Status when given valid master branch" { 
+      $branch = $branchStats | Where-Object {$_.BranchName -eq "master"}
       $branch.Status | Should be "Valid"
+    }
+
+    It "should return info for SeverityThreshold when given valid master branch" { 
+      $branch = $branchStats | Where-Object {$_.BranchName -eq "master"}
       $branch.SeverityThreshold | Should be "info"
+    }
+
+    It "should return null for Errors when given valid master branch" { 
+      $branch = $branchStats | Where-Object {$_.BranchName -eq "master"}
       $branch.Errors | Should BeNullOrEmpty
+    }
+
+    It "should return 0 stale days when given correct data for master" { 
+      $branch = $branchStats | Where-Object {$_.BranchName -eq "master"}
+      # $branch.StaleDays | Should be 0
     }
   }
 
   Context "When Add-DevelopCompare is passed valid develop compare" { 
 
     $rules = Get-DefaultRules
-    $build = Get-DefaulBuild
-    [System.Object[]]$branches = ConvertTo-Branches -Branches (Get-Content "$assetsPath\Branches.Stats.MasterAsBase.json" | Out-String | ConvertFrom-Json).Value
+    $build = Get-DefaultManualBuild
+    [System.Object[]]$branches = Get-Content "$assetsPath\Branches.Stats.MasterAsBase.json" | Out-String | ConvertFrom-Json | ConvertTo-Branches
     [System.Object[]]$developBranchStats = (Get-Content "$assetsPath\Branches.Stats.DevelopAsBase.json" | Out-String | ConvertFrom-Json).Value
 
     It "should return 5 aheadfor feature/feature1 (develop comapre)" { 
@@ -222,7 +266,7 @@ Describe "BrandRules Module Tests" {
 
   Context "When Add-PullRequests is passed valid list of active PRs" { 
 
-    [System.Object[]]$branches = ConvertTo-Branches -Branches (Get-Content "$assetsPath\Branches.Stats.MasterAsBase.json" | Out-String | ConvertFrom-Json).Value
+    [System.Object[]]$branches = Get-Content "$assetsPath\Branches.Stats.MasterAsBase.json" | Out-String | ConvertFrom-Json | ConvertTo-Branches
     $pullRequests = Get-Content "$assetsPath\PullRequests.DevelopToMaster.json" | Out-String | ConvertFrom-Json | ConvertTo-PullRequests
     
     It "should return 1 TargetPullRequests for master" { 
@@ -245,7 +289,7 @@ Describe "Default Rules with Invalid Branche Stats Tests" {
   
   function _getConextBranches {
   
-    [System.Object[]]$branches = ConvertTo-Branches -Branches (Get-Content "$assetsPath\Branches.Stats.MasterAsBase.json" | Out-String | ConvertFrom-Json).Value
+    [System.Object[]]$branches = Get-Content "$assetsPath\Branches.Stats.MasterAsBase.json" | Out-String | ConvertFrom-Json | ConvertTo-Branches
     [System.Object[]]$developBranchStats = (Get-Content "$assetsPath\Branches.Stats.DevelopAsBase.json" | Out-String | ConvertFrom-Json).Value
     $pullRequests = Get-Content "$assetsPath\PullRequests.DevelopToMaster.json" | Out-String | ConvertFrom-Json | ConvertTo-PullRequests
     $branches = Add-DevelopCompare -Branches $branches -BranchesComparedToDevelop $developBranchStats
@@ -256,27 +300,52 @@ Describe "Default Rules with Invalid Branche Stats Tests" {
 
   Context "When default rules set and validing master" { 
 
-    It "should have an error if master has an active PR" { 
+    It "should return 'has an active Pull Request' Error when master has an active PR" { 
       # Arrange
       $rules = Get-DefaultRules
       $branches = _getConextBranches
-      $build = Get-DefaulBuild
+      $branches | Where-Object {$_.BranchName -eq "master"} | Foreach {
+        $_.TargetPullRequests = 1
+        $_.SourcePullRequests = 0
+      }
+      $build = Get-DefaultPullRequestBuild
 
       #Act
       $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
       $branch = $branches | Where-Object {$_.BranchName -eq "master"}
 
       #Assert
+      $branch.TargetPullRequests | Should Be 1
+      $branch.SourcePullRequests | Should Be 0
       $branch.Errors.Count | Should be 0
     }
 
-    It "should have 0 errors when master has an active PR and build trigger is manual" { 
+    It "should return 'has an active Pull Request targeting another branch' error when SourcePullRequests=1 and NOT PR build" { 
       # Arrange
       $rules = Get-DefaultRules
       $branches = _getConextBranches
-      $build = Get-DefaulBuild
-      $build.BuildReason = "manual"
-      $build.PullRequestId = 0
+      $branches | Where-Object {$_.BranchName -eq "master"} | Foreach {
+        $_.TargetPullRequests = 0
+        $_.SourcePullRequests = 1
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "master"}
+
+      #Assert
+      $branch.TargetPullRequests | Should Be 0
+      $branch.SourcePullRequests | Should Be 1
+      $branch.Errors.Count | Should Be 1
+      $branch.Errors[0].Message | Should BeLike "*has an active Pull Request targeting another branch*"
+    }
+
+    It "should return 0 errors when master has an active PR and build trigger is manual" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $build = Get-DefaultManualBuild
       
       #Act
       $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
@@ -297,7 +366,7 @@ Describe "Default Rules with Invalid Branche Stats Tests" {
       $rules = Get-DefaultRules
       $rules.MasterMustNotHaveActivePullRequests = $false
       $branches = _getConextBranches
-      $build = Get-DefaulBuild
+      $build = Get-DefaultPullRequestBuild
       
       #Act
       $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
