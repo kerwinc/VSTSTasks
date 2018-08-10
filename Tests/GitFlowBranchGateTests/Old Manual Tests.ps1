@@ -71,12 +71,12 @@ Import-Module "$scriptLocation\ps_modules\Custom\BranchRules.psm1" -Force
 $refs = Get-Branches -ProjectCollectionUri $projectCollectionUri -ProjectName $projectName -Repository $repository
 
 $master = $refs | Where-Object { $_.name -eq "refs/heads/$($Rules.MasterBranch)" }
-if ($master -eq $null) {
+if ($null -eq $master) {
   Write-Error "Could not find remote branch: refs/heads/$($Rules.MasterBranch)"
 }
 
 $develop = $refs | Where-Object { $_.name -eq "refs/heads/$($Rules.DevelopBranch)" }
-if ($develop -eq $null) {
+if ($null -eq $develop) {
   Write-Error "Could not find remote branch: refs/heads/$($Rules.DevelopBranch)"Y
 }
 

@@ -1,0 +1,175 @@
+{
+  "count": 2,
+  "value": [
+    {
+      "commit": {
+        "commitId": "06e166aca23dedb49174b2ace3dddcdbdec4f05e",
+        "author": {
+          "name": "Kerwin Carpede",
+          "email": "kerwinc@videojunky.co.za",
+          "date": "2018-08-09T18:04:17Z"
+        },
+        "committer": {
+          "name": "Kerwin Carpede",
+          "email": "kerwinc@videojunky.co.za",
+          "date": "2018-08-09T18:04:17Z"
+        },
+        "comment": "minor change",
+        "url": "http://devtfs/DefaultCollection/Marketplace/_apis/git/repositories/e37bec70-e77e-4a85-8625-442f946e7ea5/commits/06e166aca23dedb49174b2ace3dddcdbdec4f05e"
+      },
+      "name": "develop",
+      "aheadCount": 20,
+      "behindCount": 0,
+      "isBaseVersion": false
+    },
+    {
+      "commit": {
+        "treeId": "627484d23297164fd451d0198ac63cd201bca4a5",
+        "commitId": "0dedf5ff5ce3618ba24882b8cf38d21ef7d00f0e",
+        "author": {
+          "name": "Kerwin Carpede",
+          "email": "kerwinc@videojunky.co.za",
+          "date": "2018-08-09T12:22:05Z"
+        },
+        "committer": {
+          "name": "Kerwin Carpede",
+          "email": "kerwinc@videojunky.co.za",
+          "date": "2018-08-09T12:22:05Z"
+        },
+        "comment": "feat: Added a basic vue app",
+        "parents": ["70fa2e3fdf2bb3a02114fc8036e598ba86b66cb7"],
+        "url": "http://devtfs/DefaultCollection/Marketplace/_apis/git/repositories/e37bec70-e77e-4a85-8625-442f946e7ea5/commits/0dedf5ff5ce3618ba24882b8cf38d21ef7d00f0e"
+      },
+      "name": "master",
+      "aheadCount": 5,
+      "behindCount": 1,
+      "isBaseVersion": true
+    },
+    {
+      "commit": {
+        "commitId": "06e166aca23dedb49174b2ace3dddcdbdec4f05e",
+        "author": {
+          "name": "Kerwin Carpede",
+          "email": "kerwinc@videojunky.co.za",
+          "date": "2018-08-09T18:04:17Z"
+        },
+        "committer": {
+          "name": "Kerwin Carpede",
+          "email": "kerwinc@videojunky.co.za",
+          "date": "2018-08-09T18:04:17Z"
+        },
+        "comment": "minor change",
+        "url": "http://devtfs/DefaultCollection/Marketplace/_apis/git/repositories/e37bec70-e77e-4a85-8625-442f946e7ea5/commits/06e166aca23dedb49174b2ace3dddcdbdec4f05e"
+      },
+      "name": "feature/Feature1",
+      "aheadCount": 5,
+      "behindCount": 1,
+      "isBaseVersion": false
+    },
+    {
+      "commit": {
+        "commitId": "06e166aca23dedb49174b2ace3dddcdbdec4f05e",
+        "author": {
+          "name": "Kerwin Carpede",
+          "email": "kerwinc@videojunky.co.za",
+          "date": "2018-08-09T18:04:17Z"
+        },
+        "committer": {
+          "name": "Kerwin Carpede",
+          "email": "kerwinc@videojunky.co.za",
+          "date": "2018-08-09T18:04:17Z"
+        },
+        "comment": "minor change",
+        "url": "http://devtfs/DefaultCollection/Marketplace/_apis/git/repositories/e37bec70-e77e-4a85-8625-442f946e7ea5/commits/06e166aca23dedb49174b2ace3dddcdbdec4f05e"
+      },
+      "name": "feature/Feature2",
+      "aheadCount": 5,
+      "behindCount": 1,
+      "isBaseVersion": false
+    },
+    {
+      "commit": {
+        "commitId": "06e166aca23dedb49174b2ace3dddcdbdec4f05e",
+        "author": {
+          "name": "Kerwin Carpede",
+          "email": "kerwinc@videojunky.co.za",
+          "date": "2018-08-09T18:04:17Z"
+        },
+        "committer": {
+          "name": "Kerwin Carpede",
+          "email": "kerwinc@videojunky.co.za",
+          "date": "2018-08-09T18:04:17Z"
+        },
+        "comment": "minor change",
+        "url": "http://devtfs/DefaultCollection/Marketplace/_apis/git/repositories/e37bec70-e77e-4a85-8625-442f946e7ea5/commits/06e166aca23dedb49174b2ace3dddcdbdec4f05e"
+      },
+      "name": "release/release1",
+      "aheadCount": 5,
+      "behindCount": 1,
+      "isBaseVersion": false
+    },
+    {
+      "commit": {
+        "commitId": "06e166aca23dedb49174b2ace3dddcdbdec4f05e",
+        "author": {
+          "name": "Kerwin Carpede",
+          "email": "kerwinc@videojunky.co.za",
+          "date": "2018-08-09T18:04:17Z"
+        },
+        "committer": {
+          "name": "Kerwin Carpede",
+          "email": "kerwinc@videojunky.co.za",
+          "date": "2018-08-09T18:04:17Z"
+        },
+        "comment": "minor change",
+        "url": "http://devtfs/DefaultCollection/Marketplace/_apis/git/repositories/e37bec70-e77e-4a85-8625-442f946e7ea5/commits/06e166aca23dedb49174b2ace3dddcdbdec4f05e"
+      },
+      "name": "release/release2",
+      "aheadCount": 5,
+      "behindCount": 1,
+      "isBaseVersion": false
+    },
+    {
+      "commit": {
+        "commitId": "06e166aca23dedb49174b2ace3dddcdbdec4f05e",
+        "author": {
+          "name": "Kerwin Carpede",
+          "email": "kerwinc@videojunky.co.za",
+          "date": "2018-08-09T18:04:17Z"
+        },
+        "committer": {
+          "name": "Kerwin Carpede",
+          "email": "kerwinc@videojunky.co.za",
+          "date": "2018-08-09T18:04:17Z"
+        },
+        "comment": "minor change",
+        "url": "http://devtfs/DefaultCollection/Marketplace/_apis/git/repositories/e37bec70-e77e-4a85-8625-442f946e7ea5/commits/06e166aca23dedb49174b2ace3dddcdbdec4f05e"
+      },
+      "name": "hotfix/hotfix1",
+      "aheadCount": 5,
+      "behindCount": 1,
+      "isBaseVersion": false
+    },
+    {
+      "commit": {
+        "commitId": "06e166aca23dedb49174b2ace3dddcdbdec4f05e",
+        "author": {
+          "name": "Kerwin Carpede",
+          "email": "kerwinc@videojunky.co.za",
+          "date": "2018-08-09T18:04:17Z"
+        },
+        "committer": {
+          "name": "Kerwin Carpede",
+          "email": "kerwinc@videojunky.co.za",
+          "date": "2018-08-09T18:04:17Z"
+        },
+        "comment": "minor change",
+        "url": "http://devtfs/DefaultCollection/Marketplace/_apis/git/repositories/e37bec70-e77e-4a85-8625-442f946e7ea5/commits/06e166aca23dedb49174b2ace3dddcdbdec4f05e"
+      },
+      "name": "hotfix/hotfix2",
+      "aheadCount": 5,
+      "behindCount": 1,
+      "isBaseVersion": false
+    }
+  ]
+}

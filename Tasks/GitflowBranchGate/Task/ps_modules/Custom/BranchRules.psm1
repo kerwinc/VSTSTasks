@@ -13,7 +13,7 @@ Function ConvertTo-Branches {
       
       $item | Add-Member -Type NoteProperty -Name "Develop" -Value @()
       $item | Add-Member -Type NoteProperty -Name "StaleDays" -Value (New-TimeSpan -Start $branch.commit.author.date -End (Get-Date)).Days
-      $item | Add-Member -Type NoteProperty -Name "Modified" -Value $branch.commit.author.date
+      $item | Add-Member -Type NoteProperty -Name "Modified" -Value (Get-Date $branch.commit.author.date)
       $item | Add-Member -Type NoteProperty -Name "ModifiedBy" -Value $branch.commit.author.name
       $item | Add-Member -Type NoteProperty -Name "ModifiedByEmail" -Value $branch.commit.author.email
       $item | Add-Member -Type NoteProperty -Name "IsBaseVersion" -Value $branch.isBaseVersion
@@ -39,14 +39,14 @@ Function ConvertTo-PullRequests {
   )
   Process {
     $result = @()
-    if ($PullRequests.Count -gt 0) {
-      foreach ($pullRequest in $PullRequests) {
+    if ($null -ne $PullRequests -and $PullRequests.Count -gt 0) {
+      foreach ($pullRequest in $PullRequests.Value) {
         $item = New-Object System.Object
-        $item | Add-Member -Type NoteProperty -Name "ID" -Value $pullRequest.pullRequestId
+        $item | Add-Member -Type NoteProperty -Name "ID" -Value ([convert]::ToInt64($pullRequest.pullRequestId))
         $item | Add-Member -Type NoteProperty -Name "Title" -Value $pullRequest.title
         $item | Add-Member -Type NoteProperty -Name "SourceBranch" -Value $($pullRequest.sourceRefName.Replace("refs/heads/", ""))
         $item | Add-Member -Type NoteProperty -Name "TargetBranch" -Value $($pullRequest.targetRefName.Replace("refs/heads/", ""))
-        $item | Add-Member -Type NoteProperty -Name "Created" -Value $pullRequest.creationDate
+        $item | Add-Member -Type NoteProperty -Name "Created" -Value (Get-Date $pullRequest.creationDate)
         $item | Add-Member -Type NoteProperty -Name "CreatedBy" -Value $pullRequest.createdBy.displayName
         $item | Add-Member -Type NoteProperty -Name "Status" -Value $pullRequest.status
         $item | Add-Member -Type NoteProperty -Name "SeverityThreshold" -Value "Info"
@@ -54,7 +54,7 @@ Function ConvertTo-PullRequests {
         $result += $item
       }
     }
-    return $result 
+    return $result
   }
 }
 
@@ -137,10 +137,10 @@ Function Invoke-BranchRules {
       [bool]$isCurrentPullRequest = ($branch.PullRequests | Where-Object { $_.Id -eq $Build.PullRequestId }).Count -gt 0
       
       if ($branch.BranchName -eq $Rules.MasterBranch) {
-        if ($Rules.MasterMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0 -and $isPullRequestBuild -eq $true) {
+        if ($Rules.MasterMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0 -and $isPullRequestBuild -eq $false) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request."
         }
-        if ($Rules.MasterMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0 -and $isPullRequestBuild -eq $true) {
+        if ($Rules.MasterMustNotHaveActivePullRequests -eq $true -and $branch.SourcePullRequests -gt 0 -and $isPullRequestBuild -eq $false) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request targeting another branch."
         }
       }

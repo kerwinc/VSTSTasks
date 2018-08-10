@@ -24,3 +24,5 @@ Write-Host "New Version: $newVersionNumber"
 
 # tfx build tasks upload --task-path .\Task
 tfx extension create --manifest vss-extension.json --output-path .\build\
+
+tfx build tasks upload --task-path .\Task

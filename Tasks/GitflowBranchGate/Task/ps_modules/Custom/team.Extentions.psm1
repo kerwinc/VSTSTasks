@@ -95,6 +95,6 @@ Function Get-PullRequests {
       $url = $url + "&status=$StatusFilter"
     }
     $result = Invoke-GetCommand -Url $Url
-    return $result.Value
+    return $result
   }
 }
