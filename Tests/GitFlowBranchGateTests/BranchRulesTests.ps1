@@ -482,7 +482,7 @@ Describe "Invoke-BranchRules Tests" {
     
   }
   
-  Context "When Invoke-BranchRules is executed and validating hotfixes" { 
+  Context "When Invoke-BranchRules is executed and validating hotfix branches" { 
 
     It "should return 'Hotfix branch limit reached' error when multiple hotfix branches and HotfixBranchLimit is 1" { 
       # Arrange
@@ -683,7 +683,7 @@ Describe "Invoke-BranchRules Tests" {
     It "should NOT return 'hotfix has an active Pull Request targeting another branch.' error when hotfix has an active PR and HotfixBranchesMustNotHaveActivePullRequests is false" { 
       # Arrange
       $rules = Get-DefaultRules
-      $rules.HotfixeBranchesMustNotBeBehindMaster = $false
+      $rules.HotfixBranchesMustNotHaveActivePullRequests = $false
       $branches = _getConextBranches
       $branches | Where-Object {$_.BranchName -like "hotfix/*"} | Foreach {
         $_.SourcePullRequests = 0
@@ -725,4 +725,244 @@ Describe "Invoke-BranchRules Tests" {
 
   }
 
+  Context "When Invoke-BranchRules is executed and validating release branches" { 
+
+    It "should return 'Release branch limit reached' error when multiple release branches and ReleaseBranchLimit is 1" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -like "release/*"} | Foreach {
+        $_.Master.Behind = 0
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $releaseBranches = $branches | Where-Object {$_.BranchName -like "release/*"}
+
+      #Assert
+      $releaseBranches.Count | Should Be 2
+      foreach ($branch in $releaseBranches) {
+        $branch.Errors | Where-Object {$_.Message -eq "Release branch limit reached"} | Should Not BeNullOrEmpty
+      }
+    }
+
+    It "should return 'Release1 is stale and has reached hotfix days limit' error when release branch is stale" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -eq "release/release1"} | Foreach {
+        $_.StaleDays = 11
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "release/release1"}
+
+      #Assert
+      $branch.Errors | Where-Object {$_.Message -like "*is stale and has reached release days limit"} | Should Not BeNullOrEmpty
+    }
+
+    It "should return 'Must not have hotfix and release branches at the same time' error when there are hotfix & release branches" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.MustNotHaveHotfixAndReleaseBranches = $true
+      $branches = _getConextBranches
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $releaseBranches = $branches | Where-Object {$_.BranchName -like "release/*"}
+
+      #Assert
+      $releaseBranches.Count | Should Be 2
+      foreach ($branch in $releaseBranches) {
+        $branch.Errors | Where-Object {$_.Message -eq "Must not have hotfix and release branches at the same time"} | Should Not BeNullOrEmpty
+      }
+    }
+
+    It "should NOT return 'Must not have hotfix and release branches at the same time' error when there are hotfix & release branches and MustNotHaveHotfixAndReleaseBranches is false" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.MustNotHaveHotfixAndReleaseBranches = $false
+      $branches = _getConextBranches
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $releaseBranches = $branches | Where-Object {$_.BranchName -like "release/*"}
+
+      #Assert
+      $releaseBranches.Count | Should Be 2
+      foreach ($branch in $releaseBranches) {
+        $branch.Errors | Where-Object {$_.Message -eq "Must not have hotfix and release branches at the same time"} | Should BeNullOrEmpty
+      }
+    }
+    
+    It "should return 'release is missing 50 commit(s) from master' error when release1 is behind master" {
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -eq "release/release1"} | Foreach {
+        $_.Master.Behind = 50
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "release/release1"}
+
+      #Assert
+      $branch.Errors | Where-Object {$_.Message -like "*release1 is missing 50 commit(s) from master"} | Should Not BeNullOrEmpty
+    }
+
+    It "should NOT return 'release1 is missing 50 commit(s) from master' error when release1 is behind master and HotfixeBranchesMustNotBeBehindMaster is false" {
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.ReleaseBranchesMustNotBeBehindMaster = $false
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -eq "release/release1"} | Foreach {
+        $_.Master.Behind = 50
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "release/release1"}
+
+      #Assert
+      $branch.Errors | Where-Object {$_.Message -like "*release1 is missing 50 commit(s) from master"} | Should BeNullOrEmpty
+    }
+
+    It "should return 'release has an active Pull Request.' error when release has an active PR" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -like "release/*"} | Foreach {
+        $_.TargetPullRequests = 1
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $releaseBranches = $branches | Where-Object {$_.BranchName -like "release/*"}
+
+      #Assert
+      $releaseBranches.Count | Should Be 2
+      foreach ($branch in $releaseBranches) {
+        $branch.TargetPullRequests | Should Be 1
+        $branch.Errors | Where-Object {$_.Message -like "*has an active Pull Request."} | Should Not BeNullOrEmpty
+      }
+    }
+
+    It "should return NOT 'release has an active Pull Request.' error when release has an active PR and ReleaseBranchesMustNotHaveActivePullRequests is false" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.ReleaseBranchesMustNotHaveActivePullRequests = $false
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -like "release/*"} | Foreach {
+        $_.TargetPullRequests = 1
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $releaseBranches = $branches | Where-Object {$_.BranchName -like "release/*"}
+
+      #Assert
+      $releaseBranches.Count | Should Be 2
+      foreach ($branch in $releaseBranches) {
+        $branch.TargetPullRequests | Should Be 1
+        $branch.Errors | Where-Object {$_.Message -like "*has an active Pull Request."} | Should BeNullOrEmpty
+      }
+    }
+
+    It "should NOT return 'hotfix has an active Pull Request.' error when hotfix has an no active PRs" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -like "release/*"} | Foreach {
+        $_.TargetPullRequests = 0
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $releaseBranches = $branches | Where-Object {$_.BranchName -like "release/*"}
+
+      #Assert
+      $releaseBranches.Count | Should Be 2
+      foreach ($branch in $releaseBranches) {
+        $branch.TargetPullRequests | Should Be 0
+        $branch.Errors | Where-Object {$_.Message -like "*has an active Pull Request."} | Should BeNullOrEmpty
+      }
+    }
+
+    It "should return 'release has an active Pull Request targeting another branch.' error when release has an active PR" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -like "release/*"} | Foreach {
+        $_.SourcePullRequests = 1
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $releaseBranches = $branches | Where-Object {$_.BranchName -like "release/*"}
+
+      #Assert
+      $releaseBranches.Count | Should Be 2
+      foreach ($branch in $releaseBranches) {
+        $branch.SourcePullRequests | Should Be 1 
+        $branch.Errors | Where-Object {$_.Message -like "*has an active Pull Request targeting another branch."} | Should Not BeNullOrEmpty
+      }
+    }
+
+    It "should NOT return 'release has an active Pull Request targeting another branch.' error when hotfix has an active PR and HotfixBranchesMustNotHaveActivePullRequests is false" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.ReleaseBranchesMustNotHaveActivePullRequests = $false
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -like "release/*"} | Foreach {
+        $_.SourcePullRequests = 0
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $releaseBranches = $branches | Where-Object {$_.BranchName -like "release/*"}
+
+      #Assert
+      $releaseBranches.Count | Should Be 2
+      foreach ($branch in $releaseBranches) {
+        $branch.SourcePullRequests | Should Be 0
+        $branch.Errors | Where-Object {$_.Message -like "*has an active Pull Request targeting another branch."} | Should BeNullOrEmpty
+      }
+    }
+
+    It "should NOT return 'release has an active Pull Request targeting another branch.' error when hotfix has NO active PRs" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -like "release/*"} | Foreach {
+        $_.SourcePullRequests = 0
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $releaseBranches = $branches | Where-Object {$_.BranchName -like "release/*"}
+
+      #Assert
+      $releaseBranches.Count | Should Be 2
+      foreach ($branch in $releaseBranches) {
+        $branch.SourcePullRequests | Should Be 0
+        $branch.Errors | Where-Object {$_.Message -like "*has an active Pull Request targeting another branch."} | Should BeNullOrEmpty
+      }
+    }
+
+  }
+  
 }
