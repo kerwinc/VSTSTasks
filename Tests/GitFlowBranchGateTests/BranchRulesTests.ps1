@@ -964,5 +964,139 @@ Describe "Invoke-BranchRules Tests" {
     }
 
   }
-  
+
+  Context "When Invoke-BranchRules is executed and validating feature branches" { 
+
+    It "should return 'Feature branch limit reached' error when multiple feature branches and ReleaseBranchLimit is 50" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.FeatureBranchLimit = 1
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -like "feature/*"} | Foreach {
+        $_.Master.Behind = 0
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $featureBranches = $branches | Where-Object {$_.BranchName -like "feature/*"}
+
+      #Assert
+      $featureBranches.Count | Should Be 2
+      foreach ($branch in $featureBranches) {
+        $branch.Errors | Where-Object {$_.Message -eq "Feature branch limit reached"} | Should Not BeNullOrEmpty
+      }
+    }
+
+    It "should return 'Feature1 is stale and has reached feature days limit' error when feature branch is stale" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -eq "feature/feature1"} | Foreach {
+        $_.StaleDays = 200
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "feature/feature1"}
+
+      #Assert
+      $branch.Errors | Where-Object {$_.Message -like "*is stale and has reached feature days limit"} | Should Not BeNullOrEmpty
+    }
+
+    It "should return 'Feature1 is missing 500 commit(s) from master' error when feature1 is behind master" {
+      # Arrange
+      $rules = Get-DefaultRules
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -eq "feature/feature1"} | Foreach {
+        $_.Master.Behind = 500
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "feature/feature1"}
+
+      #Assert
+      $branch.Errors | Where-Object {$_.Message -like "*feature1 is missing 500 commit(s) from master"} | Should Not BeNullOrEmpty
+    }
+
+    It "should NOT return 'Feature1 is missing 500 commit(s) from master' error when release1 is behind master and HotfixeBranchesMustNotBeBehindMaster is false" {
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.FeatureBranchesMustNotBeBehindMaster = $false
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -eq "feature/feature1"} | Foreach {
+        $_.Master.Behind = 500
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "feature/feature1"}
+
+      #Assert
+      $branch.Errors | Where-Object {$_.Message -like "*feature1 is missing 500 commit(s) from master"} | Should BeNullOrEmpty
+    }
+
+    It "should return 'Feature1 is missing 99 commit(s) from develop' error when feature1 is behind develop" {
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.FeatureBranchesMustNotBeBehindMaster = $true
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -eq "feature/feature1"} | Foreach {
+        $_.Develop.Behind = 99
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "feature/feature1"}
+
+      #Assert
+      $branch.Errors | Where-Object {$_.Message -like "*feature1 is missing 99 commit(s) from develop" -and $_.Type -eq "Error"} | Should Not BeNullOrEmpty
+    }
+
+    It "should return 'Feature1 is missing 89 commit(s) from develop' error when feature1 is behind develop and CurrentFeatureMustNotBeBehindDevelop" {
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.FeatureBranchesMustNotBeBehindDevelop = $false
+      $rules.CurrentFeatureMustNotBeBehindDevelop = $true
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -eq "feature/feature1"} | Foreach {
+        $_.Develop.Behind = 89
+      }
+      $build = Get-DefaultManualBuild
+      $build.SourceBranch = "feature/feature1"
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "feature/feature1"}
+
+      #Assert
+      $branch.Errors.Count | Should BeGreaterThan 0
+      $branch.Errors | Where-Object {$_.Message -like "*feature1 is missing 89 commit(s) from develop" -and $_.Type -eq "Error"} | Should Not BeNullOrEmpty
+    }
+
+    It "should NOT return 'Feature1 is missing 89 commit(s) from master' error when feature1 is behind develop and CurrentFeatureMustNotBeBehindDevelop is false" {
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.FeatureBranchesMustNotBeBehindDevelop = $false
+      $rules.CurrentFeatureMustNotBeBehindDevelop = $false
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -eq "feature/feature1"} | Foreach {
+        $_.Master.Behind = 89
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -eq "feature/feature1"}
+
+      #Assert
+      $branch.Errors | Where-Object {$_.Message -like "*feature1 is missing 89 commit(s) from develop" -and $_.Type -eq "Error"} | Should BeNullOrEmpty
+    }
+
+  }
+
 }
