@@ -9,7 +9,7 @@ $currentBranch = "develop"
 # $env:TEAM_AUTHTYPE = "pat"
 # $env:TEAM_PAT = "6ec7zcyb6i2fbzas3o57uqtlctydduba2xpatb5sj4rm2furrdiq"
 $env:TEAM_AUTHTYPE = "Basic" 
-$env:TEAM_PAT = "ZGV2aXRca2Vyd2luYzp3aW5rZXIxMA=="
+$env:TEAM_PAT = "NmVjN3pjeWI2aTJmYnphczNvNTd1cXRsY3R5ZGR1YmEyeHBhdGI1c2o0cm0yZnVycmRpcQ=="
 $stagingDirectory = "c:\temp\GitflowBranchGate"
 $showIssuesOnBuildSummary = $false
 

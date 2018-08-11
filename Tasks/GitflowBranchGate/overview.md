@@ -1,8 +1,6 @@
-### Overview
+### Gitflow Branch Gate
 
 This extension adds a build task to help control branch commits, enforce Gitflow conventions and branch limits. Essentially, set your builds on fire if your branching strategy, limits and rules are not followed.
-
-[![Donate](https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/Tasks/GitflowBranchGate/images/donate.png)](https://www.paypal.me/kerwincarpede)
 
 [Gitflow](http://nvie.com/posts/a-successful-git-branching-model/) is a branching model for Git, created by Vincent Driessen. It's a standardised approach that allows teams to separate feature development, release and support for emergency fixes. Sounds amazing right? Well, there are a few gotchas especially when it comes to keeping all branches up to date and making sure conventions are followed.
 
@@ -10,11 +8,12 @@ This extension adds a build task to help control branch commits, enforce Gitflow
 
 Your using the Gitflow branching model, or variation of it, Pull Requests with Team Foundation Server branch policies enabled but need a way to prevent hotfixes\releases from being rolled back! Also, while you're at it, you want to prevent stale branches...
 
-*Introducing the Gitflow Branch Gate build task...*
+_Introducing the Gitflow Branch Gate build task..._
 
 Keeping branches up to date becomes difficult as the number of developers, requirements or product delivery increases. Many teams try to adopt a trunk based branching strategy, and while this potentially solves many problems, it's not always possible. This build task aims to promote short-lived branches and assist in moving all branches forward.
 
 ### Features
+
 - Configure branch naming standards and make sure they are followed
 - Apply branch limits to hotfixes, release and feature branches
 - Set builds on fire if branches become stale
@@ -42,19 +41,3 @@ Apply branch limits for hotfixes, releases and feature branches:
 Apply branch rules for all branches and active Pull Requests:
 
 <img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/Tasks/GitflowBranchGate/images/Rules.png" alt="Rules" style=""/>
-
-### Release Notes
-
-#### 0.2.68
-- Added exceptions to some rules to allow the build to pass if the current build was initiated from a Pull Request
-- Added the branch name to the stale branch error message
-- Improved the output summary in the build log
-
-#### 0.2.64
-- Added an exclusion to the *Active Pull Request* rules if the current build's trigger was a Pull Request
-
-#### 0.2.54
-- Fixed a bug where multiple branch names were being printed for an issue
-
-#### 0.2.42
-- Initial Preview
