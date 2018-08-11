@@ -33,6 +33,7 @@ function Get-DefaultRules {
     HotfixBranchesMustNotHaveActivePullRequests  = $true
     ReleaseBranchesMustNotHaveActivePullRequests = $true
     BranchNamesMustMatchConventions              = $true
+    BypassBranchesWithNameMatchingPattern        = ''
   }
 }
 
@@ -1136,6 +1137,64 @@ Describe "Invoke-BranchRules Tests" {
       #Assert
       $branch.Errors | Where-Object {$_.Message -like "*feature1 is missing 79 commit(s) from master" -and $_.Type -eq "Error"} | Should BeNullOrEmpty
     }
+  }
+
+  Context "When Invoke-BranchRules is executed and validating Bypassed branches" { 
+
+    It "should NOT have Any errors if branch name matches bypass pattern prototype/*" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.BypassBranchesWithNameMatchingPattern = "prototype/*"
+      $branches = _getConextBranches
+      $branches | Where-Object {$_.BranchName -like "feature/feature1"} | Foreach-Object {
+        $_.Master.Behind = 500
+        $_.BranchName = "prototype/prototype1"
+      }
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $branch = $branches | Where-Object {$_.BranchName -like "prototype/prototype1"}
+
+      #Assert
+      $branch.Errors.Count | Should Be 0
+    }
+
+    It "should NOT have Any errors if branch name matches bypass pattern feature/*" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.BypassBranchesWithNameMatchingPattern = "feature/*"
+      $branches = _getConextBranches
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+      $featureBranches = $branches | Where-Object {$_.BranchName -like "feature/*"}
+
+      #Assert
+      $featureBranches.Count | Should Be 2
+      foreach ($branch in $featureBranches) {
+        $branch.Errors.Count | Should Be 0
+      }
+    }
+
+    It "should NOT have Any errors if branch name matches bypass pattern *" { 
+      # Arrange
+      $rules = Get-DefaultRules
+      $rules.BypassBranchesWithNameMatchingPattern = "*"
+      $branches = _getConextBranches
+      $build = Get-DefaultManualBuild
+
+      #Act
+      $branches = Invoke-BranchRules -Branches $branches -Build $build -Rules $rules
+
+      #Assert
+      $branches.Count | Should BeGreaterThan 0
+      foreach ($branch in $branches) {
+        $branch.Errors.Count | Should Be 0
+      }
+    }
+
   }
 
 }

@@ -46,6 +46,8 @@ $rules = New-Object psobject -Property @{
   HotfixBranchesMustNotHaveActivePullRequests  = [System.Convert]::ToBoolean((Get-VstsInput -Name "hotfixBranchesMustNotHavePendingPullRequests" -Require))
   ReleaseBranchesMustNotHaveActivePullRequests = [System.Convert]::ToBoolean((Get-VstsInput -Name "releaseBranchesMustNotHavePendingPullRequests" -Require))
   BranchNamesMustMatchConventions              = [System.Convert]::ToBoolean((Get-VstsInput -Name "branchNamesMustMatchConventions" -Require))
+
+  BypassBranchesWithNameMatchingPattern        = Get-VstsInput -Name "BypassBranchesWithNameMatchingPattern"
 }
 
 Write-Output "Project Collection: [$projectCollectionUri]"

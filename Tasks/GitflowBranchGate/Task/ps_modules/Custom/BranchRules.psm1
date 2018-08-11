@@ -136,6 +136,11 @@ Function Invoke-BranchRules {
     
     foreach ($branch in $Branches) {
       
+      if($branch.BranchName -like $Rules.BypassBranchesWithNameMatchingPattern) {
+        Write-Verbose "$($branch.BranchName) bypassed from branch rules. Skipping rule checks"
+        continue
+      }
+
       [bool]$isCurrentPullRequest = ($branch.PullRequests | Where-Object { $_.Id -eq $Build.PullRequestId }).Count -gt 0
       
       if ($branch.BranchName -eq $Rules.MasterBranch) {

@@ -15,8 +15,8 @@
   ],
   "demands": [],
   "version": {
-    "Major": "0",
-    "Minor": "4",
+    "Major": "1",
+    "Minor": "0",
     "Patch": "3"
   },
   "minimumAgentVersion": "1.91.0",
@@ -258,6 +258,15 @@
       "required": false,
       "helpMarkDown": "Turning this on will fail the build if there are branches with names that do not match the predefinied naming conventions.",
       "groupName": "rules"
+    },
+    {
+      "name": "BypassBranchesWithNameMatchingPattern",
+      "type": "string",
+      "label": "Bypass branches matching pattern",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Bypass all branch rules for any branch name matching this pattern e.g. prototype/\\*, external/\\*. Warning: setting the pattern to something like '*' could bypass rules for all branches.",
+      "groupName": "advanced"
     },
     {
       "name": "showIssuesOnBuildSummary",

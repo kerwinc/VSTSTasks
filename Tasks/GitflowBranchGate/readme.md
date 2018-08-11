@@ -6,7 +6,7 @@ This extension adds a build task to help control branch commits, enforce Gitflow
 
 ### The Scenario
 
-Your using the Gitflow branching model, or variation of it, Pull Requests with Team Foundation Server branch policies enabled but need a way to prevent hotfixes\releases from being rolled back! Also, while you're at it, you want to prevent stale branches...
+You're using the Gitflow branching model, or variation of it, Pull Requests with Team Foundation Server branch policies but need a way to prevent hotfixes\releases from being rolled back! Also, while you're at it, you want to prevent stale branches...
 
 _Introducing the Gitflow Branch Gate build task..._
 
@@ -17,7 +17,7 @@ Keeping branches up to date becomes difficult as the number of developers, requi
 - Configure branch naming standards and make sure they are followed
 - Apply branch limits to hotfixes, release and feature branches
 - Set builds on fire if branches become stale
-- Make sure all branches are never behind master
+- Make sure all branches are never behind the master branch
 - Make sure all feature branches are never behind develop
 - Prevent release & hotfix branches being created at the same time
 - Track active Pull Requests from important branches to prevent deployed changes from being rolled back
@@ -43,6 +43,10 @@ Apply branch rules for all branches and active Pull Requests:
 <img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/Tasks/GitflowBranchGate/images/Rules.png" alt="Rules" style=""/>
 
 ### Release Notes
+
+#### 1.0.3
+
+- Added the ability to bypass branches matching a wildcard pattern.
 
 #### 0.4.3
 
