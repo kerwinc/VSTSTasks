@@ -17,7 +17,7 @@
   "version": {
     "Major": "0",
     "Minor": "4",
-    "Patch": "2"
+    "Patch": "3"
   },
   "minimumAgentVersion": "1.91.0",
   "instanceNameFormat": "Gitflow Branch Gate",
@@ -226,7 +226,7 @@
     {
       "name": "CurrentFeatureMustNotBeBehindMaster",
       "type": "boolean",
-      "label": "Current Feature branch must not be behind master",
+      "label": "Current feature branch must not be behind master",
       "defaultValue": "true",
       "required": false,
       "helpMarkDown": "Turning this on will fail the build if the current feature branch being built is behind the master branch.",

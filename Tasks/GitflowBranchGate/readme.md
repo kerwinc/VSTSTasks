@@ -44,9 +44,13 @@ Apply branch rules for all branches and active Pull Requests:
 
 ### Release Notes
 
+#### 0.4.3
+
+- Updated rule description
+
 #### 0.4.2
 
-- Added a new setting to fail the current feature branch being built if its behind master. "Current feature must not be behind master"
+- Added a new setting to fail the current feature branch being built if its behind master ("Current feature must not be behind master").
 - Reordered the rules in the build step settings to group similar rules together.
 
 #### 0.3.22
