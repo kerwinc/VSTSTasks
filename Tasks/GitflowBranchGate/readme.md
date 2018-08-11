@@ -46,7 +46,7 @@ Apply branch rules for all branches and active Pull Requests:
 
 #### 0.3.22
 
-- Fixed a bug where builds fail is its queued from a Pull Request targeting master and "Master must not have any active Pull Requests" is turned on. Expecte behaviour is that it should still fail if triggered another way.
+- Fixed a bug where builds fail if queued from a Pull Request targeting master and "Master must not have any active Pull Requests" is turned on. Expected behaviour is that it should still fail if triggered another way.
 
 #### 0.2.68
 
