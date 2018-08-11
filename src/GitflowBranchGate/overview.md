@@ -26,7 +26,7 @@ Keeping branches up to date becomes difficult as the number of developers, requi
 
 The extension publishes a summary of the results to the build summary showing all issues:
 
-<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/Tasks/GitflowBranchGate/images/report-summary-2.png" alt="Report Summary"/>
+<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/src/GitflowBranchGate/images/report-summary-2.png" alt="Report Summary"/>
 
 A detailed log is provided with all rules configured for that build, branches and active Pull Requests at that point in time.
 
@@ -34,10 +34,10 @@ A detailed log is provided with all rules configured for that build, branches an
 
 Apply branch limits for hotfixes, releases and feature branches:
 
-<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/Tasks/GitflowBranchGate/images/Limits.png" alt="Branch Limits" style=""/>
+<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/src/GitflowBranchGate/images/Limits.png" alt="Branch Limits" style=""/>
 
 ### Branch Rules
 
 Apply branch rules for all branches and active Pull Requests:
 
-<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/Tasks/GitflowBranchGate/images/Rules.png" alt="Rules" style=""/>
+<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/src/GitflowBranchGate/images/Rules.png" alt="Rules" style=""/>
