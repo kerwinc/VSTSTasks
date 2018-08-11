@@ -16,8 +16,8 @@
   "demands": [],
   "version": {
     "Major": "0",
-    "Minor": "3",
-    "Patch": "22"
+    "Minor": "4",
+    "Patch": "2"
   },
   "minimumAgentVersion": "1.91.0",
   "instanceNameFormat": "Gitflow Branch Gate",
@@ -152,78 +152,6 @@
       "groupName": "limits"
     },
     {
-      "name": "hotfixMustNotBeBehindMaster",
-      "type": "boolean",
-      "label": "Hotfix branches must not be behind master",
-      "defaultValue": "true",
-      "required": false,
-      "helpMarkDown": "Turning this on will fail the build if any hotfix branches are behind the master branch.",
-      "groupName": "rules"
-    },
-    {
-      "name": "releaseMustNotBeBehindMaster",
-      "type": "boolean",
-      "label": "Release branches must not be behind master",
-      "defaultValue": "true",
-      "required": false,
-      "helpMarkDown": "Turning this on will fail the build if any release branches are behind the master branch.",
-      "groupName": "rules"
-    },
-    {
-      "name": "developMustNotBeBehindMaster",
-      "type": "boolean",
-      "label": "Develop branch must not be behind master",
-      "defaultValue": "true",
-      "required": false,
-      "helpMarkDown": "Turning this on will fail the build if the develop branch is behind the master branch.",
-      "groupName": "rules"
-    },
-    {
-      "name": "featureBranchesMustNotBeBehindMaster",
-      "type": "boolean",
-      "label": "Feature branches must not be behind Master",
-      "defaultValue": "true",
-      "required": false,
-      "helpMarkDown": "Turning this on will fail the build if ANY feature branch is behind the master branch.",
-      "groupName": "rules"
-    },
-    {
-      "name": "featureBranchesMustNotBeBehindDevelop",
-      "type": "boolean",
-      "label": "Feature branches must not be behind develop",
-      "defaultValue": "false",
-      "required": false,
-      "helpMarkDown": "Turning this on will fail the build if ANY feature branch is behind the develop branch.",
-      "groupName": "rules"
-    },
-    {
-      "name": "CurrentFeatureMustNotBeBehindDevelop",
-      "type": "boolean",
-      "label": "Current Feature branch must not be behind develop",
-      "defaultValue": "true",
-      "required": false,
-      "helpMarkDown": "Turning this on will fail the build if the current feature branch being built is behind the develop branch.",
-      "groupName": "rules"
-    },
-    {
-      "name": "CurrentFeatureMustNotBeBehindMaster",
-      "type": "boolean",
-      "label": "Current Feature branch must not be behind master",
-      "defaultValue": "true",
-      "required": false,
-      "helpMarkDown": "Turning this on will fail the build if the current feature branch being built is behind the master branch.",
-      "groupName": "rules"
-    },
-    {
-      "name": "mustNotHaveHotfixAndReleaseBranches",
-      "type": "boolean",
-      "label": "Must not have hotfix and release branches at the same time",
-      "defaultValue": "true",
-      "required": false,
-      "helpMarkDown": "Turning this on will fail the build if there are any hotfix and release branches created at the same time.",
-      "groupName": "rules"
-    },
-    {
       "name": "masterMustNotHavePendingPullRequests",
       "type": "boolean",
       "label": "Master must not have any active Pull Requests",
@@ -248,6 +176,78 @@
       "defaultValue": "true",
       "required": false,
       "helpMarkDown": "Turning this on will fail the build if there are any Pull Requests from release branches (Source = release/*).",
+      "groupName": "rules"
+    },
+    {
+      "name": "hotfixMustNotBeBehindMaster",
+      "type": "boolean",
+      "label": "Hotfix branches must not be behind master",
+      "defaultValue": "true",
+      "required": false,
+      "helpMarkDown": "Turning this on will fail the build if any hotfix branches are behind the master branch.",
+      "groupName": "rules"
+    },
+    {
+      "name": "releaseMustNotBeBehindMaster",
+      "type": "boolean",
+      "label": "Release branches must not be behind master",
+      "defaultValue": "true",
+      "required": false,
+      "helpMarkDown": "Turning this on will fail the build if any release branches are behind the master branch.",
+      "groupName": "rules"
+    },
+    {
+      "name": "mustNotHaveHotfixAndReleaseBranches",
+      "type": "boolean",
+      "label": "Must not have hotfix and release branches at the same time",
+      "defaultValue": "true",
+      "required": false,
+      "helpMarkDown": "Turning this on will fail the build if there are any hotfix and release branches created at the same time.",
+      "groupName": "rules"
+    },
+    {
+      "name": "developMustNotBeBehindMaster",
+      "type": "boolean",
+      "label": "Develop branch must not be behind master",
+      "defaultValue": "true",
+      "required": false,
+      "helpMarkDown": "Turning this on will fail the build if the develop branch is behind the master branch.",
+      "groupName": "rules"
+    },
+    {
+      "name": "featureBranchesMustNotBeBehindMaster",
+      "type": "boolean",
+      "label": "Feature branches must not be behind Master",
+      "defaultValue": "true",
+      "required": false,
+      "helpMarkDown": "Turning this on will fail the build if ANY feature branch is behind the master branch.",
+      "groupName": "rules"
+    },
+    {
+      "name": "CurrentFeatureMustNotBeBehindMaster",
+      "type": "boolean",
+      "label": "Current Feature branch must not be behind master",
+      "defaultValue": "true",
+      "required": false,
+      "helpMarkDown": "Turning this on will fail the build if the current feature branch being built is behind the master branch.",
+      "groupName": "rules"
+    },
+    {
+      "name": "featureBranchesMustNotBeBehindDevelop",
+      "type": "boolean",
+      "label": "Feature branches must not be behind develop",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Turning this on will fail the build if ANY feature branch is behind the develop branch.",
+      "groupName": "rules"
+    },
+    {
+      "name": "CurrentFeatureMustNotBeBehindDevelop",
+      "type": "boolean",
+      "label": "Current feature branch must not be behind develop",
+      "defaultValue": "true",
+      "required": false,
+      "helpMarkDown": "Turning this on will fail the build if the current feature branch being built is behind the develop branch.",
       "groupName": "rules"
     },
     {

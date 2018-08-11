@@ -131,7 +131,7 @@ Function Invoke-BranchRules {
     [System.Object]$Rules
   )
   Process {
-    $baseBranch = $Branches | Where-Object { $_.BranchName -eq $Rules.MasterBranch }
+
     [bool]$isPullRequestBuild = $Build.BuildReason -eq "PullRequest"
     
     foreach ($branch in $Branches) {
@@ -150,7 +150,7 @@ Function Invoke-BranchRules {
       if ($branch.BranchName -eq $Rules.DevelopBranch) {
         if ($Rules.DevelopMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
           if ($isPullRequestBuild -ne $true -or $isCurrentPullRequest -ne $true) {
-            $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"  
+            $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($Rules.MasterBranch)"  
           }
           else {
             Write-Verbose "Rule Skipped: [DevelopMustNotBeBehindMaster]. Current build is was initiated from PR [$($Build.PullRequestId)]"
@@ -171,7 +171,7 @@ Function Invoke-BranchRules {
         }
 
         if ($Rules.HotfixeBranchesMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
-          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($Rules.MasterBranch)"
         }
         if ($Rules.HotfixBranchesMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0 -and ($isPullRequestBuild -eq $false -or $isCurrentPullRequest -eq $false)) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request."
@@ -194,7 +194,7 @@ Function Invoke-BranchRules {
         }
 
         if ($Rules.ReleaseBranchesMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
-          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"
+          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($Rules.MasterBranch)"
         }
         if ($Rules.ReleaseBranchesMustNotHaveActivePullRequests -eq $true -and $branch.TargetPullRequests -gt 0 -and ($isPullRequestBuild -eq $false -or $isCurrentPullRequest -eq $false)) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) has an active Pull Request."
@@ -211,9 +211,6 @@ Function Invoke-BranchRules {
         if ($branch.StaleDays -gt $Rules.FeatureDaysLimit) {
           $branch | Add-Error -Type Error -Message "$($branch.BranchName) is stale and has reached feature days limit"
         }
-        if ($Rules.FeatureBranchesMustNotBeBehindMaster -eq $true -and $branch.Master.Behind -gt 0) {
-          $branch | Add-Error -Type Error -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($baseBranch.BranchName)"
-        }
         if ($branch.Develop.Behind -gt 0) {
           $type = "Warning"
           if ($Rules.FeatureBranchesMustNotBeBehindDevelop -eq $true) {
@@ -222,7 +219,18 @@ Function Invoke-BranchRules {
           if ($Rules.CurrentFeatureMustNotBeBehindDevelop -eq $true -and $branch.BranchName -eq $Build.SourceBranch) {
             $type = "Error"
           }
-          $branch | Add-Error -Type $type -Message "$($branch.BranchName) is missing $($branch.Develop.Behind) commit(s) from develop"  
+          $branch | Add-Error -Type $type -Message "$($branch.BranchName) is missing $($branch.Develop.Behind) commit(s) from $($Rules.DevelopBranch)"
+        }
+
+        if ($branch.Master.Behind -gt 0) {
+          $type = "Warning"
+          if ($Rules.FeatureBranchesMustNotBeBehindMaster -eq $true) {
+            $type = "Error"
+          }
+          if ($Rules.CurrentFeatureMustNotBeBehindMaster -eq $true -and $branch.BranchName -eq $Build.SourceBranch) {
+            $type = "Error"
+          }
+          $branch | Add-Error -Type $type -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($Rules.MasterBranch)"
         }
       }
 
