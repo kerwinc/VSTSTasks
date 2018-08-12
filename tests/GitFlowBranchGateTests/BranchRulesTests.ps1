@@ -1,7 +1,7 @@
 $sut = 'BranchRules'
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $assetsPath = Join-Path $here 'assets'
-$sourcePath = Join-Path (Get-Item -Path $here).Parent.Parent.FullName "Tasks\GitflowBranchGate"
+$sourcePath = Join-Path (Get-Item -Path $here).Parent.Parent.FullName "src\GitflowBranchGate"
 $modulesPath = Join-Path $sourcePath "Task\ps_modules\Custom"
 
 Import-Module "$modulesPath\$sut.psm1" -Force -DisableNameChecking

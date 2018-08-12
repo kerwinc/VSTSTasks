@@ -1,6 +1,6 @@
 
 $currentDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
-$taskDirectory = Join-Path (Get-Item -Path $currentDirectory).Parent.Parent.FullName "Tasks\GitflowBranchGate\Task"
+# $taskDirectory = Join-Path (Get-Item -Path $currentDirectory).Parent.Parent.FullName "src\GitflowBranchGate\Task"
 
 Write-Host "Importing Required Modules"
 Import-Module -Name Pester
