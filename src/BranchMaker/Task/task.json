@@ -1,0 +1,101 @@
+{
+  "id": "b15628f5-ba26-4250-8e69-fb729fbda870",
+  "name": "branch-maker",
+  "friendlyName": "Branch Cutter",
+  "description": "Creates a branch",
+  "author": "Kerwin Carpede",
+  "helpMarkDown": "",
+  "category": "Build",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "runsOn": [
+    "Agent"
+  ],
+  "demands": [],
+  "version": {
+    "Major": "0",
+    "Minor": "0",
+    "Patch": "6"
+  },
+  "minimumAgentVersion": "1.91.0",
+  "instanceNameFormat": "Branch Cutter",
+  "groups": [
+    {
+      "name": "branch",
+      "displayName": "Branch",
+      "isExpanded": true
+    },
+    {
+      "name": "branchPolicy",
+      "displayName": "Branch Policy",
+      "isExpanded": true
+    }
+  ],
+  "inputs": [
+    {
+      "name": "repository",
+      "type": "string",
+      "label": "Repository",
+      "defaultValue": "$(Build.Repository.Name)",
+      "required": true,
+      "helpMarkDown": "Specify the name of the repository to create the branch in",
+      "groupName": "branch"
+    },
+    {
+      "name": "sourceBranch",
+      "type": "string",
+      "label": "Source Branch",
+      "defaultValue": "master",
+      "required": true,
+      "helpMarkDown": "Specify the branch to base the new branch off. A valid branch name must be provided.",
+      "groupName": "branch"
+    },
+    {
+      "name": "requireMinimumReviewers",
+      "type": "boolean",
+      "label": "Require a minimum number of reviewers",
+      "defaultValue": "true",
+      "required": false,
+      "helpMarkDown": "Require approval from a specified number of reviewers on pull requests.",
+      "groupName": "branchPolicy"
+    },
+    {
+      "name": "minimumReviewers",
+      "type": "string",
+      "label": "Minimum number of reviewers",
+      "defaultValue": "2",
+      "required": true,
+      "helpMarkDown": "",
+      "groupName": "branchPolicy"
+    },
+    {
+      "name": "checkForLinkedWorkItems",
+      "type": "boolean",
+      "label": "Check for linked work items",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Encourage traceability by checking for linked work items on pull requests.",
+      "groupName": "branchPolicy"
+    },
+    {
+      "name": "authenticationType",
+      "type": "pickList",
+      "label": "Authentication",
+      "required": "true",
+      "defaultValue": "OAuthToken",
+      "options": {
+        "OAuthToken": "OAuth Token",
+        "WindowsAuthentication": "Windows Authentication"
+      },
+      "helpMarkDown": "Specify the authentication type to use for communicating with the TFS API. Note: For OAuth Token, 'Allow scripts to access OAuth token' must be enabled in the build definition options. If 'Windows Authentication' is selected, this would be the account being used by the Build Agent.",
+      "groupName": "advanced"
+    }
+  ],
+  "execution": {
+    "PowerShell3": {
+      "target": "run.ps1"
+    }
+  }
+}
