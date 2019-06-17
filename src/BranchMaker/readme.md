@@ -33,7 +33,11 @@ For more dynamic branch names based on dates, use an inline PowerShell script to
 
 Then use the variable in the Branch Maker step like so:
 
-[Insert Image here]
+
+```powershell
+`$date=$(Get-Date).ToString("yyyy.MM.dd");
+Write-Host "##vso[task.setvariable variable=BranchName]$date"
+````
 
 ### Release Notes
 
