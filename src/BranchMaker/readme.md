@@ -4,8 +4,6 @@ This pipeline task provides the ability to create a new branch from the tip of a
 
 If you are using Trunk Based Development or Azure DevOps team's Release Flow approach to branch management, then this may make your life a little easier when creating new release branches.
 
-<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/feature/BranchMaker/src/BranchMaker/images/branchMaker_Task.png" alt="Task" style=""/>
-
 ### Getting Started
 
 This task does not use git directly. All operations are done using the [Azure DevOps REST API](https://docs.microsoft.com/en-us/rest/api/azure/devops/?view=azure-devops-rest-5.0 "Azure DevOps REST API").
@@ -24,6 +22,8 @@ See:
 
 <img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/feature/BranchMaker/src/BranchMaker/images/branchMaker_OAuthUserPermissions_AllowOAuthToken.png" alt="Permissions" style=""/>
 
+And...
+
 <img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/feature/BranchMaker/src/BranchMaker/images/branchMaker_OAuthUserPermissions.png" alt="Permissions" style=""/>
 
 ### Key Features
@@ -37,11 +37,11 @@ See:
 
 #### Date Based Branch Names
 
-For more dynamic branch names based on dates, use an inline PowerShell script to set a "BranchName" variable like so:
+For more dynamic branch names based on the current date, use an inline PowerShell script to set a "BranchName" variable just before the Branch Maker step executes like so:
 
-[Insert Image here]
+<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/feature/BranchMaker/src/BranchMaker/images/branchMaker_Task.png" alt="Task" style=""/>
 
-Then use the variable in the Branch Maker step like so:
+With...
 
 <img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/feature/BranchMaker/src/BranchMaker/images/BranchMaker_PowerShell_SetBranchNumber.png" alt="PowerShell Script" style=""/>
 
@@ -50,7 +50,15 @@ Then use the variable in the Branch Maker step like so:
 Write-Host "##vso[task.setvariable variable=BranchName]$date"
 ````
 
+Then use the variable in the Branch Maker step like so:
+
+<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/src/BranchMaker/images/branchMaker_BranchSettings.png" alt="PowerShell Script" style=""/>
+
 ### Release Notes
+
+#### 0.1.3
+
+- Fixed documentation
 
 #### 0.1.0
 
