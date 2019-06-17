@@ -1,8 +1,8 @@
 {
   "manifestVersion": 1,
   "id": "branch-maker-task",
-  "name": "Branch Cutter",
-  "version": "0.0.6",
+  "name": "Branch Maker",
+  "version": "0.0.49",
   "publisher": "kerwincarpede",
   "galleryFlags": [
     "Private"

@@ -1,7 +1,7 @@
 {
   "id": "b15628f5-ba26-4250-8e69-fb729fbda870",
   "name": "branch-maker",
-  "friendlyName": "Branch Cutter",
+  "friendlyName": "Branch Maker",
   "description": "Creates a branch",
   "author": "Kerwin Carpede",
   "helpMarkDown": "",
@@ -17,10 +17,10 @@
   "version": {
     "Major": "0",
     "Minor": "0",
-    "Patch": "6"
+    "Patch": "49"
   },
   "minimumAgentVersion": "1.91.0",
-  "instanceNameFormat": "Branch Cutter",
+  "instanceNameFormat": "Branch Maker",
   "groups": [
     {
       "name": "branch",
@@ -44,7 +44,7 @@
       "groupName": "branch"
     },
     {
-      "name": "sourceBranch",
+      "name": "sourceBranchName",
       "type": "string",
       "label": "Source Branch",
       "defaultValue": "master",
@@ -53,31 +53,141 @@
       "groupName": "branch"
     },
     {
-      "name": "requireMinimumReviewers",
-      "type": "boolean",
-      "label": "Require a minimum number of reviewers",
-      "defaultValue": "true",
-      "required": false,
-      "helpMarkDown": "Require approval from a specified number of reviewers on pull requests.",
-      "groupName": "branchPolicy"
+      "name": "newBranchName",
+      "type": "string",
+      "label": "New Branch",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Specify the name of the new branch. Example release/M1",
+      "groupName": "branch"
     },
     {
-      "name": "minimumReviewers",
-      "type": "string",
-      "label": "Minimum number of reviewers",
-      "defaultValue": "2",
+      "name": "applyBranchPolicy",
+      "type": "boolean",
+      "label": "Apply Branch Policy",
+      "defaultValue": false,
       "required": true,
       "helpMarkDown": "",
       "groupName": "branchPolicy"
     },
     {
+      "name": "requireMinimumReviewers",
+      "type": "boolean",
+      "label": "Require a minimum number of reviewers",
+      "defaultValue": true,
+      "required": false,
+      "helpMarkDown": "Require approval from a specified number of reviewers on pull requests.",
+      "groupName": "branchPolicy",
+      "visibleRule": "applyBranchPolicy=true"
+    },
+    {
+      "name": "MinimumApproverCount",
+      "type": "string",
+      "label": "Minimum number of reviewers",
+      "defaultValue": 2,
+      "required": true,
+      "helpMarkDown": "",
+      "groupName": "branchPolicy",
+      "visibleRule": "requireMinimumReviewers=true"
+    },
+    {
+      "name": "creatorVoteCounts",
+      "type": "boolean",
+      "label": "Allow users to approve their own changes",
+      "defaultValue": false,
+      "required": false,
+      "groupName": "branchPolicy",
+      "visibleRule": "requireMinimumReviewers=true"
+    },
+    {
+      "name": "allowDownvotes",
+      "type": "boolean",
+      "label": "Allow completion even if some reviewers vote Waiting or Reject",
+      "defaultValue": "false",
+      "required": false,
+      "groupName": "branchPolicy",
+      "visibleRule": "requireMinimumReviewers=true"
+    },
+    {
+      "name": "resetOnSourcePush",
+      "type": "boolean",
+      "label": "Reset code reviewer votes when there are new changes.",
+      "defaultValue": false,
+      "required": false,
+      "groupName": "branchPolicy",
+      "visibleRule": "requireMinimumReviewers=true"
+    },
+    {
       "name": "checkForLinkedWorkItems",
       "type": "boolean",
       "label": "Check for linked work items",
-      "defaultValue": "false",
+      "defaultValue": false,
       "required": false,
       "helpMarkDown": "Encourage traceability by checking for linked work items on pull requests.",
-      "groupName": "branchPolicy"
+      "groupName": "branchPolicy",
+      "visibleRule": "applyBranchPolicy=true"
+    },
+    {
+      "name": "checkForLinkedWorkItemsType",
+      "type": "pickList",
+      "label": "CheckFor LinkedWork Items Type",
+      "required": false,
+      "defaultValue": "required",
+      "options": {
+        "required": "Required",
+        "optional": "Optional"
+      },
+      "helpMarkDown": "",
+      "groupName": "branchPolicy",
+      "visibleRule": "checkForLinkedWorkItems=true"
+    },
+    {
+      "name": "checkForCommentResolution",
+      "type": "boolean",
+      "label": "Check for comment resolution",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Check to see that all comments have been resolved on pull requests.",
+      "groupName": "branchPolicy",
+      "visibleRule": "applyBranchPolicy=true"
+    },
+    {
+      "name": "checkForCommentResolutionType",
+      "type": "pickList",
+      "label": "Check for comment resolution type",
+      "required": false,
+      "defaultValue": "required",
+      "options": {
+        "required": "Required",
+        "optional": "Optional"
+      },
+      "helpMarkDown": "",
+      "groupName": "branchPolicy",
+      "visibleRule": "checkForCommentResolution=true"
+    },
+    {
+      "name": "enforceMergeStrategy",
+      "type": "boolean",
+      "label": "Enforce a merge strategy",
+      "defaultValue": false,
+      "required": false,
+      "helpMarkDown": "Check to see that all comments have been resolved on pull requests.",
+      "groupName": "branchPolicy",
+      "visibleRule": "applyBranchPolicy=true"
+    },
+    {
+      "name": "enforceMergeStrategyType",
+      "type": "pickList",
+      "label": "Merge Strategy Type",
+      "required": false,
+      "defaultValue": "noFastForwardMerge",
+      "options": {
+        "noFastForwardMerge": "No-fast-forward merge",
+        "squashMerge": "Squash Merge"
+      },
+      "helpMarkDown": "",
+      "groupName": "branchPolicy",
+      "visibleRule": "enforceMergeStrategy=true"
     },
     {
       "name": "authenticationType",
