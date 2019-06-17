@@ -4,6 +4,8 @@ This pipeline task provides the ability to create a new branch from the tip of a
 
 If you are using Trunk Based Development or Azure DevOps team's Release Flow approach to branch management, then this may make your life a little easier when creating new release branches.
 
+<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/feature/BranchMaker/src/BranchMaker/images/branchMaker_Task.png" alt="Task" style=""/>
+
 ### Getting Started
 
 This task does not use git directly. All operations are done using the [Azure DevOps REST API](https://docs.microsoft.com/en-us/rest/api/azure/devops/?view=azure-devops-rest-5.0 "Azure DevOps REST API").
@@ -18,14 +20,20 @@ For this extension to work correctly, it's going to need a few super powers to b
 
 You can also apply these security changes to all git repositories in the project.
 
+See:
+
+<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/feature/BranchMaker/src/BranchMaker/images/branchMaker_OAuthUserPermissions.png" alt="Permissions" style=""/>
+
 ### Key Features
 
 - Allows a pipeline to create a new branch from any repo
 - Apply branch basic policy settings to the new branch
 
+<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/feature/BranchMaker/src/BranchMaker/images/branchMaker_SetBranchPolicy.png" alt="Permissions" style=""/>
+
 ### Tips
 
-#### Tip 1: Date Based Branch Names
+#### Date Based Branch Names
 
 For more dynamic branch names based on dates, use an inline PowerShell script to set a "BranchName" variable like so:
 
@@ -33,6 +41,7 @@ For more dynamic branch names based on dates, use an inline PowerShell script to
 
 Then use the variable in the Branch Maker step like so:
 
+<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/feature/BranchMaker/src/BranchMaker/images/BranchMaker_PowerShell_SetBranchNumber.png" alt="PowerShell Script" style=""/>
 
 ```powershell
 `$date=$(Get-Date).ToString("yyyy.MM.dd");
