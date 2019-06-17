@@ -22,6 +22,8 @@ You can also apply these security changes to all git repositories in the project
 
 See:
 
+<img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/feature/BranchMaker/src/BranchMaker/images/branchMaker_OAuthUserPermissions_AllowOAuthToken.png" alt="Permissions" style=""/>
+
 <img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/feature/BranchMaker/src/BranchMaker/images/branchMaker_OAuthUserPermissions.png" alt="Permissions" style=""/>
 
 ### Key Features
