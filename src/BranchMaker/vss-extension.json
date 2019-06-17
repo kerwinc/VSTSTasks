@@ -2,10 +2,10 @@
   "manifestVersion": 1,
   "id": "branch-maker-task",
   "name": "Branch Maker",
-  "version": "0.0.56",
+  "version": "0.1.2",
   "publisher": "kerwincarpede",
   "galleryFlags": [
-    "Private"
+    "Public"
   ],
   "scopes": [
     "vso.code",
@@ -36,7 +36,19 @@
   ],
   "screenshots": [
     {
-      "path": "images/extension-icon.png"
+      "path": "images/branchMaker_BranchSettings.png"
+    },
+    {
+      "path": "images/branchMaker_SetBranchPolicy.png"
+    },
+    {
+      "path": "images/branchMaker_BranchSettings.png"
+    },
+    {
+      "path": "images/branchMaker_OAuthUserPermissions.png"
+    },
+    {
+      "path": "images/branchMaker_OAuthUserPermissions_AllowOAuthToken.png"
     }
   ],
   "content": {
