@@ -1,0 +1,97 @@
+{
+  "manifestVersion": 1,
+  "id": "branch-maker-task",
+  "name": "Branch Maker",
+  "version": "0.1.2",
+  "publisher": "kerwincarpede",
+  "galleryFlags": [
+    "Public"
+  ],
+  "scopes": [
+    "vso.code",
+    "vso.code_write",
+    "vso.build_execute"
+  ],
+  "demands": [
+    "api-version/5.0"
+  ],
+  "repository": {
+    "type": "git",
+    "uri": "https://github.com/kerwinc/VSTSTasks/tree/master/Tasks/BranchMaker"
+  },
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "description": "A build task to create branches",
+  "categories": [
+    "Azure Pipelines"
+  ],
+  "tags": [
+    "Create Branch",
+    "Branch",
+    "Branch Policy",
+    "Release Flow"
+  ],
+  "screenshots": [
+    {
+      "path": "images/branchMaker_BranchSettings.png"
+    },
+    {
+      "path": "images/branchMaker_SetBranchPolicy.png"
+    },
+    {
+      "path": "images/branchMaker_BranchSettings.png"
+    },
+    {
+      "path": "images/branchMaker_OAuthUserPermissions.png"
+    },
+    {
+      "path": "images/branchMaker_OAuthUserPermissions_AllowOAuthToken.png"
+    }
+  ],
+  "content": {
+    "details": {
+      "path": "readme.md"
+    },
+    "license": {
+      "path": "license.txt"
+    }
+  },
+  "links": {
+    "home": {
+      "uri": "http://devbraino.com"
+    },
+    "repository": {
+      "uri": "https://github.com/kerwinc/VSTSTasks/tree/master/Tasks/BranchMaker"
+    },
+    "issues": {
+      "uri": "https://github.com/kerwinc/VSTSTasks/issues"
+    }
+  },
+  "branding": {
+    "color": "#3b3b98",
+    "theme": "dark"
+  },
+  "icons": {
+    "default": "images/extension-icon.png"
+  },
+  "files": [
+    {
+      "path": "Task"
+    }
+  ],
+  "contributions": [
+    {
+      "id": "branch-maker-task",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "Task"
+      }
+    }
+  ]
+}
