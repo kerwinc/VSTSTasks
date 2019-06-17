@@ -1,10 +1,10 @@
 ### Background
 
-This pipeline task provides the ability to create a new branch from the tip of another branch.
+This pipeline task provides the ability to create a new branch from the tip of another branch. This task is typically used for automating the creation of release branches with branch policies applied. This helps prevent commits from being pushed directly to release branches.
 
 ## Getting Started
 
-For this extension to work correctly, it's going to need a few super powers to be able to create a new Repo and configure branch policies.
+For this extension to work correctly, it's going to need a few super powers to be able to create a new branch and configure branch policies.
 - Enable the "Allow scripts to access the OAuth token" on the pipeline phase
 - Give the "Project Collection Build Service" the following permissions on the desired repository
     - Contribute (Allow)
@@ -12,7 +12,7 @@ For this extension to work correctly, it's going to need a few super powers to b
     - Create tag (Allow)
     - Edit policies (Allow)
 
-You can also apply these security changes to the 
+You can also apply these security changes to all git repositories in the project.
 
 ### Key Features
 
