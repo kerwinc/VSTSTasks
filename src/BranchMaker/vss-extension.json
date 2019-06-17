@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "branch-maker-task",
   "name": "Branch Maker",
-  "version": "0.0.54",
+  "version": "0.0.56",
   "publisher": "kerwincarpede",
   "galleryFlags": [
     "Private"
@@ -59,7 +59,7 @@
     }
   },
   "branding": {
-    "color": "#8e44ad",
+    "color": "#3b3b98",
     "theme": "dark"
   },
   "icons": {
