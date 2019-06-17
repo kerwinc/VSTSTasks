@@ -2,7 +2,7 @@
   "id": "b15628f5-ba26-4250-8e69-fb729fbda870",
   "name": "branch-maker",
   "friendlyName": "Branch Maker",
-  "description": "Creates a branch",
+  "description": "Create a new branch and allows you to apply a Branch Policy",
   "author": "Kerwin Carpede",
   "helpMarkDown": "",
   "category": "Build",
@@ -17,7 +17,7 @@
   "version": {
     "Major": "0",
     "Minor": "0",
-    "Patch": "49"
+    "Patch": "53"
   },
   "minimumAgentVersion": "1.91.0",
   "instanceNameFormat": "Branch Maker",
@@ -67,7 +67,7 @@
       "label": "Apply Branch Policy",
       "defaultValue": false,
       "required": true,
-      "helpMarkDown": "",
+      "helpMarkDown": "Apply a branch policy to the new branch e.g Require a minimum of approvers etc. Enable this to see all available options.",
       "groupName": "branchPolicy"
     },
     {
@@ -86,7 +86,7 @@
       "label": "Minimum number of reviewers",
       "defaultValue": 2,
       "required": true,
-      "helpMarkDown": "",
+      "helpMarkDown": "Specifiy how many approvers are required.",
       "groupName": "branchPolicy",
       "visibleRule": "requireMinimumReviewers=true"
     },

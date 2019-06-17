@@ -2,14 +2,14 @@
   "manifestVersion": 1,
   "id": "branch-maker-task",
   "name": "Branch Maker",
-  "version": "0.0.49",
+  "version": "0.0.53",
   "publisher": "kerwincarpede",
   "galleryFlags": [
     "Private"
   ],
   "scopes": [
-    "vso.work",
     "vso.code",
+    "vso.code_write",
     "vso.build_execute"
   ],
   "demands": [
@@ -31,7 +31,8 @@
   "tags": [
     "Create Branch",
     "Branch",
-    "Branch Policy"
+    "Branch Policy",
+    "Release Flow"
   ],
   "screenshots": [
     {
