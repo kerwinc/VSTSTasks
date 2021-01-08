@@ -224,6 +224,9 @@ Function Invoke-BranchRules {
           if ($Rules.CurrentFeatureMustNotBeBehindDevelop -eq $true -and $branch.BranchName -eq $Build.SourceBranch) {
             $type = "Error"
           }
+          if ($Rules.CurrentFeatureMustNotBeBehindDevelop -eq $true -and $isPullRequestBuild -eq $true -and $isCurrentPullRequest -eq $true -and $branch.SourcePullRequests -gt 0){
+            $type = "Error"
+          }
           $branch | Add-Error -Type $type -Message "$($branch.BranchName) is missing $($branch.Develop.Behind) commit(s) from $($Rules.DevelopBranch)"
         }
 
@@ -233,6 +236,9 @@ Function Invoke-BranchRules {
             $type = "Error"
           }
           if ($Rules.CurrentFeatureMustNotBeBehindMaster -eq $true -and $branch.BranchName -eq $Build.SourceBranch) {
+            $type = "Error"
+          }
+          if ($Rules.CurrentFeatureMustNotBeBehindMaster -eq $true -and $isPullRequestBuild -eq $true -and $isCurrentPullRequest -eq $true -and $branch.SourcePullRequests -gt 0){
             $type = "Error"
           }
           $branch | Add-Error -Type $type -Message "$($branch.BranchName) is missing $($branch.Master.Behind) commit(s) from $($Rules.MasterBranch)"
