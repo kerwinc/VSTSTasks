@@ -43,6 +43,9 @@ Apply branch rules for all branches and active Pull Requests:
 <img src="https://raw.githubusercontent.com/kerwinc/VSTSTasks/master/src/GitflowBranchGate/images/Rules.png" alt="Rules" style=""/>
 
 ### Release Notes
+#### 1.0.5
+
+- Added check on PullRequest if feature is behind master or develop
 
 #### 1.0.3
 
