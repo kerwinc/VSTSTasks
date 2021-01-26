@@ -285,7 +285,7 @@ Function Write-OutputCurrentBranches {
     Write-Output "------------------------------------------------------------------------------"
     Write-Output "Current Branches:"
     Write-Output "------------------------------------------------------------------------------"
-    $Branches | Select-Object BranchName, @{Name = 'Master'; Expression = { "$($_.Master.Behind) | $($_.Master.Ahead)" }}, @{Name = 'Develop'; Expression = { "$($_.Develop.Behind) | $($_.Develop.Ahead)" }}, @{Name = 'Modified'; Expression = {Get-Date $_.Modified -Format 'dd-MMM-yyyy'}}, ModifiedBy, StaleDays, @{Name = 'Issues'; Expression = {$_.Errors.Count}} | Format-Table
+    $Branches | Select-Object BranchName, @{Name = 'Master'; Expression = { "$($_.Master.Behind) | $($_.Master.Ahead)" }}, @{Name = 'Develop'; Expression = { "$($_.Develop.Behind) | $($_.Develop.Ahead)" }}, @{Name = 'Modified'; Expression = {Get-Date $_.Modified -Format 'dd-MMM-yyyy'}}, ModifiedBy, StaleDays, @{Name = 'Issues'; Expression = {$_.Errors.Count}} | Format-Table | Out-String -Width 240
   }
 }
 
@@ -299,7 +299,7 @@ Function Write-OutputPullRequests {
     Write-Output "Active Pull Requests:"
     Write-Output "------------------------------------------------------------------------------"
     if ($PullRequests -ne $null -and $PullRequests.Count -gt 0) {
-      $PullRequests | Select-Object ID, CreatedBy, SourceBranch, TargetBranch, @{Name = 'Created'; Expression = {Get-Date $_.Created -Format 'dd-MMM-yyyy'}} | Format-Table
+      $PullRequests | Select-Object ID, CreatedBy, SourceBranch, TargetBranch, @{Name = 'Created'; Expression = {Get-Date $_.Created -Format 'dd-MMM-yyyy'}} | Format-Table | Out-String -Width 240
     }
     else {
       Write-Output "There are no active Pull Requests at the moment..."
@@ -354,7 +354,7 @@ Function Write-OutputErrors {
       Write-Output "------------------------------------------------------------------------------"
       Write-Output "Branches with Errors:"
       Write-Output "------------------------------------------------------------------------------"
-      $Branches | Select-Object * -ExpandProperty Errors | Where-Object {$_.Type -eq "Error" } | Select-Object BranchName, Message | Sort-Object BranchName | Format-Table -Wrap
+      $Branches | Select-Object * -ExpandProperty Errors | Where-Object {$_.Type -eq "Error" } | Select-Object BranchName, Message | Sort-Object BranchName | Format-Table -Wrap | Out-String -Width 240
       Write-Error "Current branches did not pass the Gitflow Branch Gate rules."
     }
     else {
